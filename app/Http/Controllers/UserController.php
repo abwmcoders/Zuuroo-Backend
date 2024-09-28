@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Resources\RegistrationResource;
+use App\Interfaces\ProfileServiceInterface;
+use App\Models\LoanHistory;
 use App\Repositories\FaqRepository;
 use App\Repositories\HistoryRepository;
 use App\Repositories\NotificationRepository;
@@ -9,11 +13,16 @@ use App\Repositories\PaymentRepository;
 use App\Repositories\SupportRepository;
 use App\Repositories\UserBankDetailsRepository;
 use App\Repositories\UserRepository;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
+    use ApiResponseTrait;
+
     private PaymentRepository $PaymentRepository;
     private HistoryRepository $HistoryRepository;
     private FaqRepository $FaqRepository;
@@ -22,6 +31,8 @@ class UserController extends Controller
     private UserRepository $UserRepository;
     private $UserBankDetailsRepository;
 
+    protected $profileService;
+
     public function __construct(
         PaymentRepository $PaymentRepository,
         HistoryRepository $HistoryRepository,
@@ -29,7 +40,8 @@ class UserController extends Controller
         SupportRepository $SupportRepository,
         NotificationRepository $NotificationRepository,
         UserRepository $UserRepository,
-        UserBankDetailsRepository $UserBankDetailsRepository
+        UserBankDetailsRepository $UserBankDetailsRepository,
+        ProfileServiceInterface $profileService
     ) {
         $this->PaymentRepository = $PaymentRepository;
         $this->HistoryRepository = $HistoryRepository;
@@ -38,6 +50,7 @@ class UserController extends Controller
         $this->NotificationRepository = $NotificationRepository;
         $this->UserRepository = $UserRepository;
         $this->UserBankDetailsRepository = $UserBankDetailsRepository;
+        $this->profileService = $profileService;
     }
 
     //!---- Get Token ------
@@ -50,6 +63,109 @@ class UserController extends Controller
         ];
         $response = Http::asForm()->post('https://idp.ding.com/connect/token', $DataDetails);
         return $response['access_token'];
+    }
+
+    //!---- Get Faqs ------
+    public function faqs()
+    {
+        $faqs = $this->FaqRepository->getAllFaqs();
+        $data = [
+            'dt' => 0,
+            'records' => $faqs
+        ];
+
+        return $this->successResponse(data: $data,);
+    }
+
+    //!---- Loans ------
+    public function loans()
+    {
+        $uid = Auth::id();
+
+        $loanInfo = LoanHistory::where('user_id', $uid)
+        ->whereIn('processing_state', ['successful', 'delivered'])
+        ->where('payment_status', 'paid')
+        ->latest()
+        ->get();
+
+        $outLoan = LoanHistory::where('user_id', $uid)
+        ->whereIn('payment_status', ['pending', 'partially'])
+        ->whereIn('processing_state', ['successful', 'delivered'])
+        ->latest()
+        ->get();
+
+        $data = [
+            'loanInfo' => $loanInfo,
+            'outLoan' => $outLoan,
+        ];
+
+
+        return $this->successResponse(data: $data,);
+    }
+
+    //!---- Out Loans ------
+    public function outLoans()
+    {
+        $uid = Auth::id();
+
+        $outLoan = LoanHistory::where('user_id', $uid)
+            ->whereIn('payment_status', ['pending', 'partially'])
+            ->get();
+
+        return $this->successResponse(data: $outLoan,);
+    }
+
+    //!---- Loan Receipt ------
+    public function userLoanReceipt($id)
+    {
+        $loanInfo = LoanHistory::join('users', 'users.id', '=', 'loan_histories.user_id')
+        ->join('countries', 'countries.country_code', '=', 'loan_histories.country_code')
+        ->select('loan_histories.*', 'countries.country_name')
+        ->where('loan_histories.transfer_ref', $id)
+        ->first();
+
+        if ($loanInfo) {
+            return $this->successResponse(data: $loanInfo,);
+        } else {
+            return $this->errorResponse(message:'Loan receipt not found',code: 404,);
+        }
+    }
+
+    //!---- Support ------
+    public function supports()
+    {
+        $supports = $this->SupportRepository->getAllSupports();
+        return $this->successResponse(data: $supports,);
+    }
+
+    //!---- Profile ------
+    public function userProfile()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return $this->errorResponse(message: "User not found");
+        }
+        return $this->successResponse(data: new RegistrationResource($user),);
+    }
+    
+    //!---- Update Profile ------
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = Auth::user();
+
+        $validatedData = $request->validated();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $updatedUser = $this->profileService->updateProfile($user, $validatedData);
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile successfully updated',
+            'data' => new RegistrationResource($updatedUser)
+        ]);
     }
 
 
