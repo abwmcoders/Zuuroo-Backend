@@ -112,10 +112,7 @@ class AuthController extends Controller
         $user->otp_expires_at = null;
         $user->save();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Email verified successfully.'
-        ]);
+        return $this->successResponse(message: 'Email verified successfully.',);
     }
 
     public function requestPasswordReset( Request $request) {

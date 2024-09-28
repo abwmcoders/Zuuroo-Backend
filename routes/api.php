@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -22,6 +23,9 @@ Route::post('/password/reset', [PasswordResetController::class, 'reset']);
 Route::middleware('auth:sanctum')->group(function () {
     //! ---- Logout ----
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //! ---- Home ----
+    Route::get('/home', [HomeController::class, 'index']);
 
     //! ---- Verify email ----
     Route::get('/email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify')->middleware(['signed']);

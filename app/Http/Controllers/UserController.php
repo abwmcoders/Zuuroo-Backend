@@ -17,6 +17,7 @@ use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
@@ -148,6 +149,40 @@ class UserController extends Controller
         }
         return $this->successResponse(data: new RegistrationResource($user),);
     }
+
+    //!-- Update Password ----
+    public function updatePassword(Request $request)
+    {
+        $uid = Auth::user()->id;
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed']
+        ]);
+
+        $userDetails = [
+            'password' => Hash::make($request->password)
+        ];
+
+        $this->UserRepository->updateUser($uid, $userDetails);
+        return response()->json(['message' => 'Password updated successfully.']);
+    }
+
+    //!-- Update Phone Number ----
+    public function updatePhoneNumber(Request $request)
+    {
+        $uid = Auth::user()->id;
+        $data = $request->validate([
+            'phoneNumber' => ['required', 'numeric']
+        ]);
+
+        $userDetails = [
+            'mobile' => $request->phoneNumber,
+            'number_verify_at' => null
+        ];
+
+        $this->UserRepository->updateUser($uid, $userDetails);
+        return $this->successResponse(message: 'Phone number updated successfully.',);
+    }
+
     
     //!---- Update Profile ------
     public function updateProfile(UpdateProfileRequest $request)
