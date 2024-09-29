@@ -26,5 +26,13 @@ class DatabaseSeeder extends Seeder
             'referral_code' => '12345',
             'email_verified_at' => time(),
         ]);
+
+        $this->call([
+            FaqSeeder::class,
+            TermConditionSeeder::class,
+            HistorySeeder::class,
+            LoanHistorySeeder::class,
+            RecurringChargeSeeder::class,
+        ]);
     }
 }
