@@ -254,6 +254,7 @@ class AuthController extends Controller
                     'name' => $data['name'],
                     'email' => $data['email'],
                     'password' => Hash::make($data['password']),
+                    'create_pin' => Hash::make(12345),
                     'mobile' => $data['telephone'],
                     'dob' => $data['dob'],
                     'username' => $data['username'],

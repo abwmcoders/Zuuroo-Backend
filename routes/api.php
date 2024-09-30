@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PasswordResetController;
@@ -34,6 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
     //! ---- Profile ----
     Route::get('/profile', [UserController::class, 'userProfile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
+
+    //! ---- Airtime Purchase ----
+    Route::post('/airtime/purchase', [AirtimeController::class, 'createAirtime']);
+
 
     //! ---- User Activities ----
     Route::get('/faqs', [UserController::class, 'faqs']);
