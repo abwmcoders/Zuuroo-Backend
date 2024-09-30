@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DataController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TermConditionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Http\Request;
@@ -39,6 +42,19 @@ Route::middleware('auth:sanctum')->group(function () {
     //! ---- Airtime Purchase ----
     Route::post('/airtime/purchase', [AirtimeController::class, 'createAirtime']);
 
+    //! ---- Data Purchase ----
+    Route::post('/data/purchase', [DataController::class, 'createData']);
+
+    //! ---- terms And Condition ----
+    Route::prefix('term-conditions')->group(function () {
+        Route::get('/', [TermConditionController::class, 'index']);     
+        Route::post('/', [TermConditionController::class, 'store']);    
+        Route::get('{id}', [TermConditionController::class, 'show']); 
+        Route::put('{id}', [TermConditionController::class, 'update']);  
+        Route::delete('{id}', [TermConditionController::class, 'destroy']);
+    });
+
+
 
     //! ---- User Activities ----
     Route::get('/faqs', [UserController::class, 'faqs']);
@@ -46,6 +62,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/out-loans', [UserController::class, 'outLoans']);
     Route::get('/user-loan-receipt/{id}', [UserController::class, 'userLoanReceipt']);
     Route::put('/update-password', [UserController::class, 'updatePassword']);
+    Route::put('/update-pin', [UserController::class, 'updatePin']);
     Route::put('/update-phone', [UserController::class, 'updatePhoneNumber']);
+});
+
+Route::prefix('admin')->group(function () {
+    // Public routes
+    Route::post('create', [AdminController::class, 'create'])->name('admin.create'); // Admin registration
+    Route::post('login', [AdminController::class, 'login'])->name('admin.login');   // Admin login
+
+    // Protected routes (requires auth:api middleware)
+    Route::middleware(['auth:api'])->group(function () {
+        Route::post('signout', [AdminController::class, 'signout'])->name('admin.signout');   // Admin logout
+        Route::get('dashboard', [AdminController::class, 'admin_dashboard'])->name('admin.dashboard'); // Admin dashboard
+    });
 });
 

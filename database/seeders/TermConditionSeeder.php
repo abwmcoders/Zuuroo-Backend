@@ -24,5 +24,16 @@ class TermConditionSeeder extends Seeder
             'write_up' => 'By using this platform, you agree to all the conditions mentioned.',
             'admin' => 'Another Admin'
         ]);
+
+        TermCondition::create([
+            'write_up' => 'These are the terms and conditions for using our VTU services...',
+            'admin'    => 'admin@example.com'
+        ]);
+
+        TermCondition::create([
+            'write_up' => 'By using this service, you agree to abide by the following rules...',
+            'admin'    => 'admin2@example.com'
+        ]);
+
     }
 }

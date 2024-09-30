@@ -166,6 +166,22 @@ class UserController extends Controller
         return response()->json(['message' => 'Password updated successfully.']);
     }
 
+    //!-- Update Pin ----
+    public function updatePin(Request $request)
+    {
+        $uid = Auth::user()->id;
+        $data = $request->validate([
+            'pin' => ['required', 'string', 'min:8', 'confirmed']
+        ]);
+
+        $userDetails = [
+            'create_pin' => Hash::make($request->pin)
+        ];
+
+        $this->UserRepository->updateUser($uid, $userDetails);
+        return response()->json(['message' => 'Pin updated successfully.']);
+    }
+
     //!-- Update Phone Number ----
     public function updatePhoneNumber(Request $request)
     {
