@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -16,7 +17,7 @@ class AdminController extends Controller
 
     public function __construct(AdminRepository $AdminRepository, ActivityRepository $ActivityRepository)
     {
-        $this->middleware(['auth:api'])->except(['login', 'create']);
+        //$this->middleware(['auth:api'])->except(['login', 'create']);
         $this->AdminRepository = $AdminRepository;
         $this->ActivityRepository = $ActivityRepository;
     }
@@ -37,11 +38,12 @@ class AdminController extends Controller
         $AdminDetails = [
             'name'      => $request->fullname,
             'email'     => $request->email,
+            'username'     => $request->fullname,
             'telephone' => $request->number,
             'gender'    => $request->gender,
             'address'   => $request->username,
-            'role'      => Hash::make(2),
-            'status'    => Hash::make(0),
+            'role'      => $request->role,//Hash::make(2),
+            'status'    => $request->status,//Hash::make(0),
             'password'  => Hash::make($request->password),
             'country'   => 'Nigeria',
         ];
@@ -76,6 +78,7 @@ class AdminController extends Controller
                     return response()->json(['message' => 'User Account Suspended/Inactive'], 403);
                 } else {
                     // Add activity logging
+                    $token = $user->createToken('authToken')->plainTextToken;
                     $Activities = [
                         'username' => $user->name,
                         'report'   => 'Logged In'
@@ -83,7 +86,7 @@ class AdminController extends Controller
                     $this->ActivityRepository->createActivity($Activities);
 
                     // Return user data as API response (you can use JWT or Passport for token handling)
-                    return response()->json(['message' => 'Login Successful', 'user' => $user], 200);
+                    return response()->json(['message' => 'Login Successful', 'user' => $user, 'token' => $token,], 200);
                 }
             } else {
                 return response()->json(['message' => 'Invalid Login Details'], 401);
@@ -94,18 +97,37 @@ class AdminController extends Controller
     }
 
     // Logout Admin (API)
-    public function signout()
+    public function signout(Request $request)
     {
-        $Activities = [
-            'username' => session('LoggedAdminFullName'),
-            'report'   => 'Logged Out'
-        ];
+        $admin = Auth::user();
 
-        $this->ActivityRepository->createActivity($Activities);
+        if ($admin) {
+            // Revoke the current access token
+            $request->user()->currentAccessToken()->delete();
 
-        session()->flush();
-        return response()->json(['message' => 'Logout Successful'], 200);
+            // Log the logout activity
+            $Activities = [
+                'username' => $admin->username,
+                'report'   => 'Logged Out'
+            ];
+            $this->ActivityRepository->createActivity($Activities);
+
+            // Return a successful response
+            return response()->json(['message' => 'Logout Successful'], 200);
+        }
+
+        return response()->json(['message' => 'No active session found'], 401);
     }
+        // $Activities = [
+        //     'username' => session('LoggedAdminFullName'),
+        //     'report'   => 'Logged Out'
+        // ];
+
+        // $this->ActivityRepository->createActivity($Activities);
+
+        // session()->flush();
+        // return response()->json(['message' => 'Logout Successful'], 200);
+    
 
     // Admin Dashboard (API)
     public function admin_dashboard()

@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             HistorySeeder::class,
             LoanHistorySeeder::class,
             RecurringChargeSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }

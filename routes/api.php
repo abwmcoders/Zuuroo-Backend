@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
@@ -55,6 +56,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
+    //! ---- Faqs ----
+    Route::prefix('faqs')->group(function () {
+        Route::get('/', [FaqController::class, 'index']);
+        Route::get('{id}', [FaqController::class, 'show']);
+        Route::post('/', [FaqController::class, 'store']);   
+        Route::put('{id}', [FaqController::class, 'update']); 
+        Route::delete('{id}', [FaqController::class, 'destroy']); 
+    });
+
 
     //! ---- User Activities ----
     Route::get('/faqs', [UserController::class, 'faqs']);
@@ -66,15 +76,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/update-phone', [UserController::class, 'updatePhoneNumber']);
 });
 
-Route::prefix('admin')->group(function () {
-    // Public routes
-    Route::post('create', [AdminController::class, 'create'])->name('admin.create'); // Admin registration
-    Route::post('login', [AdminController::class, 'login'])->name('admin.login');   // Admin login
 
-    // Protected routes (requires auth:api middleware)
-    Route::middleware(['auth:api'])->group(function () {
-        Route::post('signout', [AdminController::class, 'signout'])->name('admin.signout');   // Admin logout
-        Route::get('dashboard', [AdminController::class, 'admin_dashboard'])->name('admin.dashboard'); // Admin dashboard
+//! ---- Admin Activities ---------------------------------------------------------------------------------------
+
+Route::post('/admin/register', [AdminController::class, 'create']);
+Route::post('/admin/login', [AdminController::class, 'login']);
+
+Route::prefix('admin')->group(function () {
+
+    //! Protected routes (requires auth:sanctum middleware)
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('signout', [AdminController::class, 'signout']); 
+        Route::get('dashboard', [AdminController::class, 'admin_dashboard']); 
     });
 });
 

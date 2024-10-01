@@ -19,10 +19,13 @@ use App\Models\Operator;
 use App\Models\OtherProduct;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Traits\ApiResponseTrait;
 use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 
 class ProductController extends Controller
 {
+    use ApiResponseTrait;
+
     private $TermConditionsRepository;
     private $ProductRepository;
     private $SupportRepository;
@@ -47,18 +50,14 @@ class ProductController extends Controller
         if($isLoan->is_loan==1)
         {
             Country::where('country_code', $id)->update(['is_loan'=>0]);
-            return response()->json([
-                'message' => 'Operation Succeeded'
-            ]);
+            return $this->successResponse(message: 'Operation Succeeded',);
             // Alert::success('Success', 'Operation succeeded');
             // return back();
         }
         else
         {
             Country::where('country_code', $id)->update(['is_loan'=>1]);
-            return response()->json([
-                'message' => 'Operation Succeeded'
-            ]);
+            return $this->successResponse(message: 'Operation Succeeded',);
         }
     }
 
@@ -67,18 +66,14 @@ class ProductController extends Controller
         if($isLoan->status==1)
         {
             LoanLimit::whereId($id)->update(['status'=>0]);
-            return response()->json([
-                'message' => 'Operation Succeeded'
-            ]);
+            return $this->successResponse(message: 'Operation Succeeded',);
             // Alert::success('Success', 'Operation succeeded');
             // return back();
         }
         else
         {
             LoanLimit::where('id', $id)->update(['status'=>1]);
-            return response()->json([
-                'message' => 'Operation Succeeded'
-            ]);
+            return $this->successResponse(message: 'Operation Succeeded',);
         }
     }
 
@@ -87,16 +82,14 @@ class ProductController extends Controller
         if($isLoan->status==true)
         {
             LoanLimit::whereId($id)->update(['status'=>0]);
-            return response()->json([
-                'message' => 'Operation Succeeded'
-            ]);
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
         else
         {
             LoanLimit::whereId($id)->update(['status'=>1]);
-            return response()->json([
-                'message' => 'Operation Succeeded'
-            ]);
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
     }
 
@@ -106,21 +99,21 @@ class ProductController extends Controller
         if($isLoan->status==1)
         {
             Country::whereId($id)->update(['status'=>0]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
         else
         {
             Country::whereId($id)->update(['status'=>1]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
     }
 
     public function delete_country($id) {
         $delete = Country::whereId($id)->delete();
-        FacadesAlert::success('Success', 'Operation succeeded');
-        return back();
+        return $this->successResponse(message: 'Operation Succeeded',);
+        
     }
 
     // ----------------------------------NETWORK OPERATORS ----------------------------------
@@ -130,14 +123,14 @@ class ProductController extends Controller
         if($isLoan->status==1)
         {
             Operator::whereId($id)->update(['status'=>0]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+           
         }
         else
         {
             Operator::where('operator_code', $id)->update(['status'=>1]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
     }
     public function make_admin_page($id)
@@ -146,14 +139,14 @@ class ProductController extends Controller
         $disable_admin = User::whereId($id)->update([ 'role'=>1 ]);
         if($disable_admin)
         {
-            FacadesAlert::success("Success!", "User Has Been Assigned A Role Of Admin ...");
-            return back();
+            return $this->successResponse(message: 'User Has Been Assigned A Role Of Admin ...',);
+            
         }
     }
     public function delete_network($id) {
         $delete = Operator::where('operator_code', $id)->delete();
-        FacadesAlert::success('Success', 'Operation succeeded');
-        return back();
+        return $this->successResponse(message: 'Operation Succeeded',);
+        
     }
 
 
@@ -161,34 +154,32 @@ class ProductController extends Controller
     // ------------------------------------ DELETE PRODUCT CATEGORY --------------------------------------------
     public function delete_productCat($id) {
         ProductCategory::where('category_code', $id)->delete();
-        FacadesAlert::success('Success', 'Operation succeeded');
-        return back();
+        return $this->successResponse(message: 'Operation Succeeded',);
+       
     }
     // ------------------------------------ DELETE PRODUCT  --------------------------------------------
     public function delete_product($id) {
         Product::where('product_code', $id)->delete();
-        FacadesAlert::success('Success', 'Operation succeeded');
-        return back();
+        return $this->successResponse(message: 'Operation Succeeded',);
+        
     }
     public function delete_faq($id)
     {
         $this->FaqRepository->deleteFaq($id);
-        FacadesAlert::success('Success', 'FAQ Deleted !!!');
-        return back();
+        return $this->successResponse(message: 'FAQ DELETED !!!! ',);
+        
     }
     public function deleteSsupportPage($id)
     {
         $delSupp = $this->SupportRepository->deleteSupportRecord($id);
-
-        FacadesAlert::success('Success', 'Selected Support Info Deleted !!!');
-        return back();
+        return $this->successResponse(message: 'Selected Support Info Deleted !!!',);
+        
     }
     public function delete_terms($id)
     {
         $delSupp = $this->TermConditionsRepository->deleteTermCondition($id);
-
-        FacadesAlert::success('Success', 'Selected Support Info Deleted !!!');
-        return back();
+        return $this->successResponse(message: 'Selected Support Info Deleted !!!',);
+        
     }
 
 
@@ -213,14 +204,14 @@ class ProductController extends Controller
         if( $sql != null)
         {
             ProductCategory::where('category_code', $categoryCode)->update([ 'operator_code'=>$operatorCode, 'category_code'=>$categoryCode, 'category_name'=>$categoryName ]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
         else
         {
             ProductCategory::create([ 'operator_code'=>$operatorCode, 'category_code'=>$categoryCode, 'category_name'=>$categoryName ]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
     }
 
@@ -260,8 +251,8 @@ class ProductController extends Controller
                                 'price'=>$price,
                                 'loan_price'=>$loanprice
                             ]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-                            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
         else
         {
@@ -275,8 +266,8 @@ class ProductController extends Controller
                 'price'=>$price,
                 'loan_price'=>$loanprice
             ]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
     }
 
@@ -294,8 +285,8 @@ class ProductController extends Controller
         $make_admin = User::whereId($id)->update([ 'password'=>$password]);
         if($make_admin)
         {
-            FacadesAlert::success("Success!", "User Password Successfully Changed To :".$request->password);
-            return back();
+            return $this->successResponse(message: "User Password Successfully Changed To :" . $request->password,);
+            
         }
     }
 
@@ -330,8 +321,8 @@ class ProductController extends Controller
                                 'is_loan'=>0,
                                 'phone_code'=>$phonecode,
                             ]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-                            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
         else
         {
@@ -341,8 +332,8 @@ class ProductController extends Controller
                 'is_loan'=>0,
                 'phone_code'=>$phonecode,
             ]);
-            FacadesAlert::success('Success', 'Operation succeeded');
-            return back();
+            return $this->successResponse(message: 'Operation Succeeded',);
+            
         }
     }
 
@@ -358,13 +349,13 @@ class ProductController extends Controller
         $insFaq = $this->FaqRepository->createFaq($FaqDetails);
         if($insFaq)
         {
-            FacadesAlert::success('Success', 'New Faq Added');
-            return back();
+            return $this->successResponse(message: 'New FAQ Added',);
+            
         }
         else
         {
-            FacadesAlert::error('Oops!', 'An Error Occured Whil Processing Your Request');
-            return back();
+            return $this->errorResponse(message: 'An Error Occured Whil Processing Your Request',);
+            
         }
     }
 
@@ -385,13 +376,13 @@ class ProductController extends Controller
         $insSupp = $this->SupportRepository->createSupport($SupportDetails);
         if($insSupp)
         {
-            FacadesAlert::success('Success', 'New Support Added');
-            return back();
+            return $this->successResponse(message: 'New Support Added',);
+            
         }
         else
         {
-            FacadesAlert::error('Oops!', 'An Error Occured Whil Processing Your Request');
-            return back();
+            return $this->errorResponse(message: 'An Error Occured Whil Processing Your Request',);
+            
         }
     }
 
@@ -407,13 +398,13 @@ class ProductController extends Controller
         $insSupp = $this->TermConditionsRepository->createTermCondition($SupportDetails);
         if($insSupp)
         {
-            FacadesAlert::success('Success', 'New Support Added');
-            return back();
+            return $this->successResponse(message: 'New Support Added',);
+            
         }
         else
         {
-            FacadesAlert::error('Oops!', 'An Error Occured Whil Processing Your Request');
-            return back();
+            return $this->successResponse(message: 'An Error Occured Whil Processing Your Request',);
+           
         }
     }
 
@@ -434,21 +425,21 @@ class ProductController extends Controller
             $update_price = OtherProduct::whereId($id)->update([ 'variation_amount'=>$request->product_price, 'loan_perc'=>$request->loan_perc  ]);
 
             if($update_price ){
-                FacadesAlert::success('Success', 'Airtime Price Updated');
-                return back();
+                return $this->successResponse(message: 'Airtime Price Updated',);
+                
             }else{
-                FacadesAlert::error('Success', 'Unable To Add Price');
-                return back();
+                return $this->errorResponse(message: 'Unable To Add Price',);
+                
             }
         }
         else{
             $update_price = OtherProduct::create([ 'variation_amount'=>$request->product_price, 'loan_perc'=>$request->loan_perc  ]);
             if($update_price ){
-                FacadesAlert::success('Success', 'Airtime Price Updated');
-                return back();
+                return $this->successResponse(message: 'Airtime Price Updated',);
+                
             }else{
-                FacadesAlert::error('Success', 'Unable To Add Price');
-                return back();
+                return $this->errorResponse(message: 'Unable To Add Price Support Added',);
+                
             }
         }
 
@@ -472,21 +463,21 @@ class ProductController extends Controller
             $update_price = OtherProduct::whereId($id)->update([ 'variation_amount'=>$request->product_price]);
 
             if($update_price ){
-                FacadesAlert::success('Success', 'Data Price Updated');
-                return back();
+                return $this->successResponse(message: 'Data Price Updated',);
+               
             }else{
-                FacadesAlert::error('Success', 'Unable To Add Price');
-                return back();
+                return $this->errorResponse(message: 'Unable Tp Add Price ',);
+                
             }
         }
         else{
             $update_price = OtherProduct::create([ 'variation_amount'=>$request->product_price]);
             if($update_price ){
-                FacadesAlert::success('Success', 'Data Price Updated');
-                return back();
+                return $this->successResponse(message: 'Data Price Updated',);
+               
             }else{
-                FacadesAlert::error('Success', 'Unable To Add Price');
-                return back();
+                return $this->errorResponse(message: 'Unable To Add Price',);
+                
             }
         }
 
@@ -506,14 +497,14 @@ class ProductController extends Controller
         if( $Loanlimit == null)
         {
             LoanLimit::create([ 'labelName'=> $labelName, 'percentage'=> $percentage, 'status'=>true ]);
-            FacadesAlert::success("Success!", "Operation Completed !!!");
-            return back();
+            return $this->successResponse(message: "Operation Completed !!!",);
+            
         }
         else
         {
             LoanLimit::where( 'labelName', $labelName)->update([ 'labelName'=> $labelName, 'percentage'=> $percentage, 'status'=>true ]);
-            FacadesAlert::success("Success!", "Operation Completed !!!");
-            return back();
+            return $this->successResponse(message: "Operation Completed !!!",);
+            
         }
     }
 
@@ -537,21 +528,21 @@ class ProductController extends Controller
             $update_price = MaxLimit::whereId($productId)->update([ 'limit_value'=>$productPrice, 'admin'=>$admin ]);
 
             if($update_price ){
-                FacadesAlert::success('Success!', 'Operation Successful');
-                return back();
+                return $this->successResponse(message: "Operation Completed !!!",);
+               
             }else{
-                FacadesAlert::error('Error!', 'Unable To Process The Request');
-                return back();
+                return $this->errorResponse(message: "Unable To Process The Request !!!",);
+                
             }
         }
         else{
             $update_price = OtherProduct::create([ 'limit_value'=>$productPrice, 'admin'=>$admin ]);
             if($update_price ){
-                FacadesAlert::success('Success!', 'Operation Successful');
-                return back();
+                return $this->successResponse(message: "Operation Completed !!!",);
+                
             }else{
-                FacadesAlert::error('Error!', 'Unable To Process The Request');
-                return back();
+                return $this->errorResponse(message: "Unable To Process The Request !!!",);
+                
             }
         }
 
@@ -583,15 +574,14 @@ class ProductController extends Controller
         $data = $this->ProductRepository->updateProduct($ProductId, $ProductDetails);
         if($data)
         {
-
-            FacadesAlert::success('Success', 'Record Successfully Updated');
-            return back();
+            return $this->successResponse(message: "Record Successfully Up[dated !!!",);
+            
 
         }
         else
         {
-            FacadesAlert::error('Oops!', 'An Error Occured While Processing Your Request !!!');
-            return back();
+            return $this->errorResponse(message: "An Error Occurred While Processing Your Request !!!",);
+           
         }
 
     }
@@ -600,8 +590,8 @@ class ProductController extends Controller
     public function delete_loanLimit($id)
     {
         $delSupp = LoanLimit::destroy($id);
-        FacadesAlert::success('Success', 'Selected Limit Info Deleted !!!');
-        return back();
+        return $this->successResponse(message: "Selected Limit Info Deleted !!!",);
+        
     }
 
          // Activate / Deactivate Operator ------------------------------->
@@ -614,19 +604,13 @@ class ProductController extends Controller
 
          if( $sql )
          {
-            return response()->json([
-                'success'       => true,
-                'statusCode'    => 200,
-                'message'       => 'Operation succeeded'
-            ]);
+            return $this->successResponse(message: "Operation Completed !!!",);
+            
          }
          else
          {
-            return response()->json([
-                'success'       => false,
-                'statusCode'    => 500,
-                'message'       => 'Operation Failed, Try Later !!!'
-            ]);
+            return $this->errorResponse(message: "Operation Failed, Try Again Later !!!",);
+            
          }
      }
 
@@ -637,19 +621,13 @@ class ProductController extends Controller
 
          if( $sql )
          {
-            return response()->json([
-                'success'       => true,
-                'statusCode'    => 200,
-                'message'       => 'Operation succeeded'
-            ]);
+            return $this->successResponse(message: "Operation Completed !!!",);
+            
          }
          else
          {
-            return response()->json([
-                'success'       => false,
-                'statusCode'    => 500,
-                'message'       => 'Operation Failed, Try Later !!!'
-            ]);
+            return $this->errorResponse(message: "Operation Failed, Try Again Later !!!",);
+            
          }
      }
 
@@ -657,9 +635,8 @@ class ProductController extends Controller
     : JsonResponse
     {
         $OperatorId = $request->route('id');
-        return response()->json([
-            'data' => $this->ProductRepository->getProductByCode($OperatorId)
-        ]);
+        return $this->successResponse(data: $this->ProductRepository->getProductByCode($OperatorId),);
+        
     }
 
     //
@@ -667,9 +644,8 @@ class ProductController extends Controller
     : JsonResponse
     {
         $OperatorId = $request->route('id');
-        return response()->json([
-            'data' => $this->ProductRepository->ProductByOperator($OperatorId)
-        ]);
+        return $this->successResponse(data: $this->ProductRepository->ProductByOperator($OperatorId),);
+        
 
     // $productResponse = json_decode($response->getBody()->getContents(), true);
     // return $productResponse['Items'];
@@ -679,9 +655,8 @@ class ProductController extends Controller
     : JsonResponse
     {
         $OperatorId = $request->route('id');
-        return response()->json([
-            'data' => $this->ProductRepository->ProductByOperator($OperatorId)
-        ]);
+        return $this->successResponse(data: $this->ProductRepository->ProductByOperator($OperatorId),);
+        
     }
 
 
@@ -690,14 +665,9 @@ class ProductController extends Controller
     : JsonResponse
     {
         $CategoryId = $request->route('id');
-
-        return response()->json([
-            'data'  => $this->ProductRepository->getProductByCategory($CategoryId)
-        ]);
+        return $this->successResponse(data: $this->ProductRepository->getProductByCategory($CategoryId),);
+        
     }
-
-
-
 
 
 }
