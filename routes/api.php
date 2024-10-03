@@ -3,9 +3,11 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillPayment;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KycController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TermConditionController;
@@ -32,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
     //! ---- Home ----
     Route::get('/home', [HomeController::class, 'index']);
 
+    //! ---- KYC ----
+    Route::post('kyc/verification', [KycController::class, 'verify_bvn']);
+
     //! ---- Verify email ----
     Route::get('/email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify')->middleware(['signed']);
     Route::post('/email/resend', [VerificationController::class, 'resend'])->middleware(['throttle:6,1']);
@@ -45,6 +50,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //! ---- Data Purchase ----
     Route::post('/data/purchase', [DataController::class, 'createData']);
+
+    //! ---- Bill Purchase ----
+    Route::post('bill/verify-meter', [BillPayment::class, 'verify_meterNo']);
+    Route::post('/bill/payment', [BillPayment::class, 'payElectricity']);
+
+
+    //! ---- Cable Purchase ----
+    Route::post('cable/verify-iuc', [BillPayment::class, 'verify_iucNo']);
+    Route::get('/cable/cable-plan/{id}', [BillPayment::class, 'getCablePlan']);
+    Route::post('/cable/payment', [BillPayment::class, 'payCableTV']);
 
     //! ---- terms And Condition ----
     Route::prefix('term-conditions')->group(function () {
