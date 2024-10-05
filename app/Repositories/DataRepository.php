@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\RequestException;
 
-class DataRepository 
+class DataRepository
 {
     public static function getToken(){
         $DataDetails = [

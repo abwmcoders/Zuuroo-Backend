@@ -20,84 +20,107 @@ class ProductCategoryController extends Controller
     public function index()
     : JsonResponse
     {
-        return response()->json([
-            'data' => $this->ProductCategoryRepository->getAllProductCategories()
-        ]);
+        try{
+            return response()->json([
+                'data' => $this->ProductCategoryRepository->getAllProductCategories()
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function store(Request $request)
     : JsonResponse
     {
-        $ProductCategoryDetails = $request->only([
-            'operator_code',
-            'category_name',
-            'category_code',
-            'status'
-        ]);
-
-        return response()->json(
-            [
-                'data' => $this->ProductCategoryRepository->createProductCategory($ProductCategoryDetails)
-            ],
-            Response::HTTP_CREATED
-        );
+        try{
+            $ProductCategoryDetails = $request->only([
+                'operator_code',
+                'category_name',
+                'category_code',
+                'status'
+            ]);
+            return response()->json(
+                [
+                    'data' => $this->ProductCategoryRepository->createProductCategory($ProductCategoryDetails)
+                ],
+                Response::HTTP_CREATED
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 
     public function show(Request $request)
     : JsonResponse
     {
-        $ProductCategoryId = $request->route('id');
-
-        return response()->json([
-            'data' => $this->ProductCategoryRepository->getProductCategoryById($ProductCategoryId)
-        ]);
+        try{
+            $ProductCategoryId = $request->route('id');
+            return response()->json([
+                'data' => $this->ProductCategoryRepository->getProductCategoryById($ProductCategoryId)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
-    
-    
+
+
     public function update(Request $request)
     : JsonResponse
     {
-        $ProductCategoryId = $request->route('id');
-
-        $ProductCategoryDetails = $request->only([
-            'operator_code',
-            'category_name',
-            'category_code',
-            'status'
-        ]);
-
-        return response()->json([
-            'data' => $this->ProductCategoryRepository->updateProductCategory($ProductCategoryId, $ProductCategoryDetails)
-        ]);
+        try{
+            $ProductCategoryId = $request->route('id');
+            $ProductCategoryDetails = $request->only([
+                'operator_code',
+                'category_name',
+                'category_code',
+                'status'
+            ]);
+            return response()->json([
+                'data' => $this->ProductCategoryRepository->updateProductCategory($ProductCategoryId, $ProductCategoryDetails)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function destroy(Request $request)
     : JsonResponse
     {
-        $ProductCategoryId = $request->route('id');
-
-        $this->ProductCategoryRepository->deleteProductCategory($ProductCategoryId);
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        try{
+            $ProductCategoryId = $request->route('id');
+            $this->ProductCategoryRepository->deleteProductCategory($ProductCategoryId);
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
-    
+
     public function ProductCategoryStatus(Request $request)
     : JsonResponse
     {
-        $ProductCategoryId = $request->route('id');
-        return response()->json([
-            'data' => $this->ProductCategoryRepository->getProductCategoryByStatus($ProductCategoryId)
-        ]);
+        try{
+            $ProductCategoryId = $request->route('id');
+            return response()->json([
+                'data' => $this->ProductCategoryRepository->getProductCategoryByStatus($ProductCategoryId)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function ProductCategoryByOperator(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-        return response()->json([
-            'data' => $this->ProductCategoryRepository->getProductCategoryByOperator($OperatorId)
-        ]);
+        try{
+            $OperatorId = $request->route('id');
+            return response()->json([
+                'data' => $this->ProductCategoryRepository->getProductCategoryByOperator($OperatorId)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 

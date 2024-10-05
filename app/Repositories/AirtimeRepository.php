@@ -30,6 +30,15 @@ class AirtimeRepository
         return $response['access_token'];
     }
 
+    public function createAlhAirtime(array $AirtimeDetails)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
+            'Content-Type' => 'application/json'
+        ])->post('https://alrahuzdata.com.ng/api/airtime/', $AirtimeDetails);
+        return $response;
+    }
+
     public function createNgAirtime(array $AirtimeDetails)
     {
         $response = Http::withHeaders([

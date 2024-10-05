@@ -24,84 +24,108 @@ class OperatorController extends Controller
     public function index()
     : JsonResponse
     {
-        return response()->json([
-            'data' => $this->OperatorRepository->getAllOperators()
-        ]);
+        try{
+            return response()->json([
+                'data' => $this->OperatorRepository->getAllOperators()
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function store(Request $request)
     : JsonResponse
     {
-        $OperatorDetails = $request->only([
-            'country_code', 
-            'operator_name',
-            'operator_code' ,
-            'status'
-        ]);
-
-        return response()->json(
-            [
-                'data' => $this->OperatorRepository->createOperator($OperatorDetails)
-            ],
-            Response::HTTP_CREATED
-        );
+        try{
+            $OperatorDetails = $request->only([
+                'country_code',
+                'operator_name',
+                'operator_code' ,
+                'status'
+            ]);
+            return response()->json(
+                [
+                    'data' => $this->OperatorRepository->createOperator($OperatorDetails)
+                ],
+                Response::HTTP_CREATED
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+    }
     }
 
 
     public function show(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-
-        return response()->json([
-            'data' => $this->OperatorRepository->getOperatorById($OperatorId)
-        ]);
+        try{
+            $OperatorId = $request->route('id');
+            return response()->json([
+                'data' => $this->OperatorRepository->getOperatorById($OperatorId)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
-    
-    
+
+
     public function update(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-
-        $OperatorDetails = $request->only([
-            'country_code', 
-            'operator_name',
-            'operator_code' ,
-            'status'
-        ]);
-
-        return response()->json([
-            'data' => $this->OperatorRepository->updateOperator($OperatorId, $OperatorDetails)
-        ]);
+        try{
+            $OperatorId = $request->route('id');
+            $OperatorDetails = $request->only([
+                'country_code',
+                'operator_name',
+                'operator_code' ,
+                'status'
+            ]);
+            return response()->json([
+                'data' => $this->OperatorRepository->updateOperator($OperatorId, $OperatorDetails)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
+
 
     public function destroy(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-
-        $this->OperatorRepository->deleteOperator($OperatorId);
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        try{
+            $OperatorId = $request->route('id');
+            $this->OperatorRepository->deleteOperator($OperatorId);
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
-    
+
     public function operatorStatus(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-        return response()->json([
-            'data' => $this->OperatorRepository->getOperatorByStatus($OperatorId)
-        ]);
+        try{
+            $OperatorId = $request->route('id');
+            return response()->json([
+                'data' => $this->OperatorRepository->getOperatorByStatus($OperatorId)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function operatorsByCountry(Request $request)
     : JsonResponse
     {
-        $CountryIso = $request->route('id');
-        return response()->json([
-            'data' => $this->OperatorRepository->getOperatorByCountry($CountryIso)
-        ]);
+        try{
+            $CountryIso = $request->route('id');
+            return response()->json([
+                'data' => $this->OperatorRepository->getOperatorByCountry($CountryIso)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 

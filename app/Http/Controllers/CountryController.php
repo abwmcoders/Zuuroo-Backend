@@ -21,90 +21,117 @@ class CountryController extends Controller
     public function index()
     : JsonResponse
     {
-        return response()->json([
-            'data' => $this->CountryRepository->getAllCountries()
-        ]);
+        try{
+            return response()->json([
+                'data' => $this->CountryRepository->getAllCountries()
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function store(Request $request)
     : JsonResponse
     {
-        $CountryDetails = $request->only([
-            'country_name', 
+        try{
+            $CountryDetails = $request->only([
+            'country_name',
             'country_code',
             'is_loan' ,
             'phone_code',
             'status'
-        ]);
-
-        return response()->json(
-            [
-                'data' => $this->CountryRepository->createCountry($CountryDetails)
-            ],
-            Response::HTTP_CREATED
-        );
+            ]);
+            return response()->json(
+                [
+                    'data' => $this->CountryRepository->createCountry($CountryDetails)
+                ],
+                Response::HTTP_CREATED
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function show(Request $request)
     : JsonResponse
     {
-        $CountryId = $request->route('id');
-
-        return response()->json([
-            'data' => $this->CountryRepository->getCountryById($CountryId)
-        ]);
+        try{
+            $CountryId = $request->route('id');
+            return response()->json([
+                'data' => $this->CountryRepository->getCountryById($CountryId)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function update(Request $request)
     : JsonResponse
     {
-        $CountryId = $request->route('id');
-
-        $CountryDetails = $request->only([
-            'country_name', 
-            'country_code',
-            'is_loan' ,
-            'phone_code',
-            'status'
-        ]);
-
-        return response()->json([
-            'data' => $this->CountryRepository->updateCountry($CountryId, $CountryDetails)
-        ]);
+        try{
+                $CountryId = $request->route('id');
+            $CountryDetails = $request->only([
+                'country_name',
+                'country_code',
+                'is_loan' ,
+                'phone_code',
+                'status'
+            ]);
+            return response()->json([
+                'data' => $this->CountryRepository->updateCountry($CountryId, $CountryDetails)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function destroy(Request $request)
     : JsonResponse
     {
-        $CountryId = $request->route('id');
-
-        $this->CountryRepository->deleteCountry($CountryId);
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        try{
+            $CountryId = $request->route('id');
+            $this->CountryRepository->deleteCountry($CountryId);
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function isloan()
     : JsonResponse
     {
-        return response()->json([
-            'data' => $this->CountryRepository->getLoanCountries()
-        ]);
+        try{
+            return response()->json([
+                'data' => $this->CountryRepository->getLoanCountries()
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function phoneCode(Request $request)
     : JsonResponse
     {
-        $countryIso = $request->route('id');
-        return response()->json([
-            'data' => $this->CountryRepository->getPhoneCode($countryIso)
-        ]);
+        try{
+            $countryIso = $request->route('id');
+            return response()->json([
+                'data' => $this->CountryRepository->getPhoneCode($countryIso)
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function CountryByStatus()
     : JsonResponse
     {
-        return response()->json([
-            'data'=> $this->CountryRepository->CountryByStatus()
-        ]);
+        try{
+            return response()->json([
+                'data'=> $this->CountryRepository->CountryByStatus()
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 }

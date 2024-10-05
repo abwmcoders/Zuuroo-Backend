@@ -46,140 +46,190 @@ class ProductController extends Controller
 
         //GET FUNCTIONS ========================================================>>>>>>>>>>>>>>>>>>>>>>
     public function isLoan($id) : JsonResponse {
-        $isLoan = Country::where('country_code', $id)->first();
-        if($isLoan->is_loan==1)
-        {
-            Country::where('country_code', $id)->update(['is_loan'=>0]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            // Alert::success('Success', 'Operation succeeded');
-            // return back();
-        }
-        else
-        {
-            Country::where('country_code', $id)->update(['is_loan'=>1]);
-            return $this->successResponse(message: 'Operation Succeeded',);
+        try{
+            $isLoan = Country::where('country_code', $id)->first();
+            if($isLoan->is_loan==1)
+            {
+                Country::where('country_code', $id)->update(['is_loan'=>0]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+                // Alert::success('Success', 'Operation succeeded');
+                // return back();
+            }
+            else
+            {
+                Country::where('country_code', $id)->update(['is_loan'=>1]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
     public function activateRepay($id) : JsonResponse {
-        $isLoan = LoanLimit::whereId($id)->first();
-        if($isLoan->status==1)
-        {
-            LoanLimit::whereId($id)->update(['status'=>0]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            // Alert::success('Success', 'Operation succeeded');
-            // return back();
-        }
-        else
-        {
-            LoanLimit::where('id', $id)->update(['status'=>1]);
-            return $this->successResponse(message: 'Operation Succeeded',);
+        try{
+            $isLoan = LoanLimit::whereId($id)->first();
+            if($isLoan->status==1)
+            {
+                LoanLimit::whereId($id)->update(['status'=>0]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+                // Alert::success('Success', 'Operation succeeded');
+                // return back();
+            }
+            else
+            {
+                LoanLimit::where('id', $id)->update(['status'=>1]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
     public function isLoanlimit($id) : JsonResponse {
-        $isLoan = LoanLimit::whereId($id)->first();
-        if($isLoan->status==true)
-        {
-            LoanLimit::whereId($id)->update(['status'=>0]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
-        }
-        else
-        {
-            LoanLimit::whereId($id)->update(['status'=>1]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
+        try{
+            $isLoan = LoanLimit::whereId($id)->first();
+            if($isLoan->status==true)
+            {
+                LoanLimit::whereId($id)->update(['status'=>0]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+            else
+            {
+                LoanLimit::whereId($id)->update(['status'=>1]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
 
     public function toggle_countryStatus($id) {
-        $isLoan = Country::whereId($id)->first();
-        if($isLoan->status==1)
-        {
-            Country::whereId($id)->update(['status'=>0]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
-        }
-        else
-        {
-            Country::whereId($id)->update(['status'=>1]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
+        try{
+            $isLoan = Country::whereId($id)->first();
+            if($isLoan->status==1)
+            {
+                Country::whereId($id)->update(['status'=>0]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+            else
+            {
+                Country::whereId($id)->update(['status'=>1]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
     public function delete_country($id) {
-        $delete = Country::whereId($id)->delete();
-        return $this->successResponse(message: 'Operation Succeeded',);
-        
+        try{
+            $delete = Country::whereId($id)->delete();
+            return $this->successResponse(message: 'Operation Succeeded',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     // ----------------------------------NETWORK OPERATORS ----------------------------------
 
     public function toggle_NetworkStatus($id) {
-        $isLoan = Operator::where('operator_code', $id)->first();
-        if($isLoan->status==1)
-        {
-            Operator::whereId($id)->update(['status'=>0]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-           
-        }
-        else
-        {
-            Operator::where('operator_code', $id)->update(['status'=>1]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
+        try{
+            $isLoan = Operator::where('operator_code', $id)->first();
+            if($isLoan->status==1)
+            {
+                Operator::whereId($id)->update(['status'=>0]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+            else
+            {
+                Operator::where('operator_code', $id)->update(['status'=>1]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
     public function make_admin_page($id)
     {
         # code...
-        $disable_admin = User::whereId($id)->update([ 'role'=>1 ]);
-        if($disable_admin)
-        {
-            return $this->successResponse(message: 'User Has Been Assigned A Role Of Admin ...',);
-            
+        try{
+            $disable_admin = User::whereId($id)->update([ 'role'=>1 ]);
+            if($disable_admin)
+            {
+                return $this->successResponse(message: 'User Has Been Assigned A Role Of Admin ...',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
+
     public function delete_network($id) {
-        $delete = Operator::where('operator_code', $id)->delete();
-        return $this->successResponse(message: 'Operation Succeeded',);
-        
+        try{
+            $delete = Operator::where('operator_code', $id)->delete();
+            return $this->successResponse(message: 'Operation Succeeded',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 
 
     // ------------------------------------ DELETE PRODUCT CATEGORY --------------------------------------------
     public function delete_productCat($id) {
-        ProductCategory::where('category_code', $id)->delete();
-        return $this->successResponse(message: 'Operation Succeeded',);
-       
+        try{
+            ProductCategory::where('category_code', $id)->delete();
+            return $this->successResponse(message: 'Operation Succeeded',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
     // ------------------------------------ DELETE PRODUCT  --------------------------------------------
+
     public function delete_product($id) {
-        Product::where('product_code', $id)->delete();
-        return $this->successResponse(message: 'Operation Succeeded',);
-        
+        try{
+            Product::where('product_code', $id)->delete();
+            return $this->successResponse(message: 'Operation Succeeded',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
     public function delete_faq($id)
     {
-        $this->FaqRepository->deleteFaq($id);
-        return $this->successResponse(message: 'FAQ DELETED !!!! ',);
-        
+        try{
+            $this->FaqRepository->deleteFaq($id);
+            return $this->successResponse(message: 'FAQ DELETED !!!! ',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
+
     public function deleteSsupportPage($id)
     {
-        $delSupp = $this->SupportRepository->deleteSupportRecord($id);
-        return $this->successResponse(message: 'Selected Support Info Deleted !!!',);
-        
+        try{
+            $delSupp = $this->SupportRepository->deleteSupportRecord($id);
+            return $this->successResponse(message: 'Selected Support Info Deleted !!!',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
+
+
     public function delete_terms($id)
     {
-        $delSupp = $this->TermConditionsRepository->deleteTermCondition($id);
-        return $this->successResponse(message: 'Selected Support Info Deleted !!!',);
-        
+        try{
+            $delSupp = $this->TermConditionsRepository->deleteTermCondition($id);
+            return $this->successResponse(message: 'Selected Support Info Deleted !!!',);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 
@@ -189,151 +239,159 @@ class ProductController extends Controller
     // POST FUNCTIONS ======================================================>>>>>>>>>>>>>>>>>>>>
 
     public function manage_networks(Request $request) {
-        // dd($request->all());
-        $request->validate([
-            'operatorCode'   => ['required', 'string'],
-            'productCat'    => ['required', 'string'],
-        ]);
+        try{
+            $request->validate([
+                'operatorCode'   => ['required', 'string'],
+                'productCat'    => ['required', 'string'],
+            ]);
 
+            $operatorCode = $request->operatorCode;
+            $categoryCode = $operatorCode.'_'.$request->productCat;
+            $categoryName = $request->productCat;
 
-        $operatorCode = $request->operatorCode;
-        $categoryCode = $operatorCode.'_'.$request->productCat;
-        $categoryName = $request->productCat;
+            $sql = ProductCategory::where('category_code', $categoryCode)->first();
+            if( $sql != null)
+            {
+                ProductCategory::where('category_code', $categoryCode)->update([ 'operator_code'=>$operatorCode, 'category_code'=>$categoryCode, 'category_name'=>$categoryName ]);
+                return $this->successResponse(message: 'Operation Succeeded',);
 
-        $sql = ProductCategory::where('category_code', $categoryCode)->first();
-        if( $sql != null)
-        {
-            ProductCategory::where('category_code', $categoryCode)->update([ 'operator_code'=>$operatorCode, 'category_code'=>$categoryCode, 'category_name'=>$categoryName ]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
-        }
-        else
-        {
-            ProductCategory::create([ 'operator_code'=>$operatorCode, 'category_code'=>$categoryCode, 'category_name'=>$categoryName ]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
+            }
+            else
+            {
+                ProductCategory::create([ 'operator_code'=>$operatorCode, 'category_code'=>$categoryCode, 'category_name'=>$categoryName ]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
     public function add_product(Request $request) {
-        dd($request->all());
-        $request->validate([
-            'countryName' => ['required', 'string'],
-            'operator'    => ['required', 'string'],
-            'productCat'  => ['required', 'string'],
-            'product'     => ['required', 'string'],
-            'productCode' => ['required', 'string'],
-            'price'       => ['required', 'string'],
-            'loanprice'   => ['required', 'string'],
-        ]);
-
-
-
-        $countryName    = $request->countryName;
-        $operator       = $request->operator;
-        $productCat     = $request->productCat;
-        $product        = $request->product;
-        $productCode    = $request->productCode;
-        $price          = $request->price;
-        $loanprice      = $request->loanprice;
-
-        $sql = Product::where('product_code', $productCode)->first();
-        if( $sql != null)
-        {
-            ProductCategory::where('product_code', $productCode)
-                            ->update([
-                                'category_code'=>$productCat,
-                                'country_code'=>$countryName,
-                                'operator_name'=>$operator,
-                                'operator_code'=>$productCode,
-                                'product_code'=>$productCode,
-                                'product_name'=>$product,
-                                'price'=>$price,
-                                'loan_price'=>$loanprice
-                            ]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
-        }
-        else
-        {
-            ProductCategory::create([
-                'category_code'=>$productCat,
-                'country_code'=>$countryName,
-                'operator_name'=>$operator,
-                'operator_code'=>$productCode,
-                'product_code'=>$productCode,
-                'product_name'=>$product,
-                'price'=>$price,
-                'loan_price'=>$loanprice
+        try{
+            $request->validate([
+                'countryName' => ['required', 'string'],
+                'operator'    => ['required', 'string'],
+                'productCat'  => ['required', 'string'],
+                'product'     => ['required', 'string'],
+                'productCode' => ['required', 'string'],
+                'price'       => ['required', 'string'],
+                'loanprice'   => ['required', 'string'],
             ]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
+            $countryName    = $request->countryName;
+            $operator       = $request->operator;
+            $productCat     = $request->productCat;
+            $product        = $request->product;
+            $productCode    = $request->productCode;
+            $price          = $request->price;
+            $loanprice      = $request->loanprice;
+
+            $sql = Product::where('product_code', $productCode)->first();
+            if( $sql != null)
+            {
+                ProductCategory::where('product_code', $productCode)
+                                ->update([
+                                    'category_code'=>$productCat,
+                                    'country_code'=>$countryName,
+                                    'operator_name'=>$operator,
+                                    'operator_code'=>$productCode,
+                                    'product_code'=>$productCode,
+                                    'product_name'=>$product,
+                                    'price'=>$price,
+                                    'loan_price'=>$loanprice
+                                ]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+            else
+            {
+                ProductCategory::create([
+                    'category_code'=>$productCat,
+                    'country_code'=>$countryName,
+                    'operator_name'=>$operator,
+                    'operator_code'=>$productCode,
+                    'product_code'=>$productCode,
+                    'product_name'=>$product,
+                    'price'=>$price,
+                    'loan_price'=>$loanprice
+                ]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
     public function change_user_password(Request $request)
     {
+        try{
         # code...
-        // dd( $request->all() );
-        $request->validate([
-            'user_id'   => ['required', 'numeric'],
-            'password'  => ['required', 'string', 'max:200']
-        ]);
+            // dd( $request->all() );
+            $request->validate([
+                'user_id'   => ['required', 'numeric'],
+                'password'  => ['required', 'string', 'max:200']
+            ]);
 
-        $id = $request->user_id;
-        $password = Hash::make($request->password);
-        $make_admin = User::whereId($id)->update([ 'password'=>$password]);
-        if($make_admin)
-        {
-            return $this->successResponse(message: "User Password Successfully Changed To :" . $request->password,);
-            
+            $id = $request->user_id;
+            $password = Hash::make($request->password);
+            $make_admin = User::whereId($id)->update([ 'password'=>$password]);
+            if($make_admin)
+            {
+                return $this->successResponse(message: "User Password Successfully Changed To :" . $request->password,);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
     public function add_country(Request $request) {
-        $request->validate([
-            'countryName' => ['required', 'string'],
-            'shortcode' => ['required', 'string'],
-            'phonecode'    => ['required', 'string'],
-            'capital'  => ['required', 'string'],
-            'currency'     => ['required', 'string'],
-            'currency_name' => ['required', 'string'],
-        ]);
-
-        //!TODO:: PRODUCT CODE MISSING
-        $productCode    = $request->productCode;
-
-
-        $countryName = $request->countryName;
-        $shortcode = $request->shortcode;
-        $phonecode = $request->phonecode;
-        $capital = $request->capital;
-        $currency = $request->currency;
-        $currency_name = $request->currency_name;
-
-        $sql = Country::where('country_code', $shortcode)->first();
-        if( $sql != null)
-        {
-            Country::where('country_code', $productCode)
-                            ->update([
-                                'country_name'=>$countryName,
-                                'country_code'=>$shortcode,
-                                'is_loan'=>0,
-                                'phone_code'=>$phonecode,
-                            ]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
-        }
-        else
-        {
-            Country::create([
-                'country_name'=>$countryName,
-                'country_code'=>$shortcode,
-                'is_loan'=>0,
-                'phone_code'=>$phonecode,
+        try{
+            $request->validate([
+                'countryName' => ['required', 'string'],
+                'shortcode' => ['required', 'string'],
+                'phonecode'    => ['required', 'string'],
+                'capital'  => ['required', 'string'],
+                'currency'     => ['required', 'string'],
+                'currency_name' => ['required', 'string'],
             ]);
-            return $this->successResponse(message: 'Operation Succeeded',);
-            
+
+            //!TODO:: PRODUCT CODE MISSING
+            $productCode    = $request->productCode;
+            $countryName = $request->countryName;
+            $shortcode = $request->shortcode;
+            $phonecode = $request->phonecode;
+            $capital = $request->capital;
+            $currency = $request->currency;
+            $currency_name = $request->currency_name;
+
+            $sql = Country::where('country_code', $shortcode)->first();
+            if( $sql != null)
+            {
+                Country::where('country_code', $productCode)
+                                ->update([
+                                    'country_name'=>$countryName,
+                                    'country_code'=>$shortcode,
+                                    'is_loan'=>0,
+                                    'phone_code'=>$phonecode,
+                                ]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+            else
+            {
+                Country::create([
+                    'country_name'=>$countryName,
+                    'country_code'=>$shortcode,
+                    'is_loan'=>0,
+                    'phone_code'=>$phonecode,
+                ]);
+                return $this->successResponse(message: 'Operation Succeeded',);
+
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
     }
 
@@ -350,12 +408,12 @@ class ProductController extends Controller
         if($insFaq)
         {
             return $this->successResponse(message: 'New FAQ Added',);
-            
+
         }
         else
         {
             return $this->errorResponse(message: 'An Error Occured Whil Processing Your Request',);
-            
+
         }
     }
 
@@ -377,12 +435,12 @@ class ProductController extends Controller
         if($insSupp)
         {
             return $this->successResponse(message: 'New Support Added',);
-            
+
         }
         else
         {
             return $this->errorResponse(message: 'An Error Occured Whil Processing Your Request',);
-            
+
         }
     }
 
@@ -399,12 +457,12 @@ class ProductController extends Controller
         if($insSupp)
         {
             return $this->successResponse(message: 'New Support Added',);
-            
+
         }
         else
         {
             return $this->successResponse(message: 'An Error Occured Whil Processing Your Request',);
-           
+
         }
     }
 
@@ -426,20 +484,20 @@ class ProductController extends Controller
 
             if($update_price ){
                 return $this->successResponse(message: 'Airtime Price Updated',);
-                
+
             }else{
                 return $this->errorResponse(message: 'Unable To Add Price',);
-                
+
             }
         }
         else{
             $update_price = OtherProduct::create([ 'variation_amount'=>$request->product_price, 'loan_perc'=>$request->loan_perc  ]);
             if($update_price ){
                 return $this->successResponse(message: 'Airtime Price Updated',);
-                
+
             }else{
                 return $this->errorResponse(message: 'Unable To Add Price Support Added',);
-                
+
             }
         }
 
@@ -464,20 +522,20 @@ class ProductController extends Controller
 
             if($update_price ){
                 return $this->successResponse(message: 'Data Price Updated',);
-               
+
             }else{
                 return $this->errorResponse(message: 'Unable Tp Add Price ',);
-                
+
             }
         }
         else{
             $update_price = OtherProduct::create([ 'variation_amount'=>$request->product_price]);
             if($update_price ){
                 return $this->successResponse(message: 'Data Price Updated',);
-               
+
             }else{
                 return $this->errorResponse(message: 'Unable To Add Price',);
-                
+
             }
         }
 
@@ -498,13 +556,13 @@ class ProductController extends Controller
         {
             LoanLimit::create([ 'labelName'=> $labelName, 'percentage'=> $percentage, 'status'=>true ]);
             return $this->successResponse(message: "Operation Completed !!!",);
-            
+
         }
         else
         {
             LoanLimit::where( 'labelName', $labelName)->update([ 'labelName'=> $labelName, 'percentage'=> $percentage, 'status'=>true ]);
             return $this->successResponse(message: "Operation Completed !!!",);
-            
+
         }
     }
 
@@ -529,20 +587,20 @@ class ProductController extends Controller
 
             if($update_price ){
                 return $this->successResponse(message: "Operation Completed !!!",);
-               
+
             }else{
                 return $this->errorResponse(message: "Unable To Process The Request !!!",);
-                
+
             }
         }
         else{
             $update_price = OtherProduct::create([ 'limit_value'=>$productPrice, 'admin'=>$admin ]);
             if($update_price ){
                 return $this->successResponse(message: "Operation Completed !!!",);
-                
+
             }else{
                 return $this->errorResponse(message: "Unable To Process The Request !!!",);
-                
+
             }
         }
 
@@ -575,13 +633,13 @@ class ProductController extends Controller
         if($data)
         {
             return $this->successResponse(message: "Record Successfully Up[dated !!!",);
-            
+
 
         }
         else
         {
             return $this->errorResponse(message: "An Error Occurred While Processing Your Request !!!",);
-           
+
         }
 
     }
@@ -591,7 +649,7 @@ class ProductController extends Controller
     {
         $delSupp = LoanLimit::destroy($id);
         return $this->successResponse(message: "Selected Limit Info Deleted !!!",);
-        
+
     }
 
          // Activate / Deactivate Operator ------------------------------->
@@ -605,12 +663,12 @@ class ProductController extends Controller
          if( $sql )
          {
             return $this->successResponse(message: "Operation Completed !!!",);
-            
+
          }
          else
          {
             return $this->errorResponse(message: "Operation Failed, Try Again Later !!!",);
-            
+
          }
      }
 
@@ -622,41 +680,47 @@ class ProductController extends Controller
          if( $sql )
          {
             return $this->successResponse(message: "Operation Completed !!!",);
-            
+
          }
          else
          {
             return $this->errorResponse(message: "Operation Failed, Try Again Later !!!",);
-            
+
          }
      }
 
     public function getProductById(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-        return $this->successResponse(data: $this->ProductRepository->getProductByCode($OperatorId),);
-        
+        try{
+            $OperatorId = $request->route('id');
+            return $this->successResponse(data: $this->ProductRepository->getProductByCode($OperatorId),);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     //
     public function ProductByOperator(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-        return $this->successResponse(data: $this->ProductRepository->ProductByOperator($OperatorId),);
-        
-
-    // $productResponse = json_decode($response->getBody()->getContents(), true);
-    // return $productResponse['Items'];
+        try{
+            $OperatorId = $request->route('id');
+            return $this->successResponse(data: $this->ProductRepository->ProductByOperator($OperatorId),);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
     public function getProductByPhone(Request $request)
     : JsonResponse
     {
-        $OperatorId = $request->route('id');
-        return $this->successResponse(data: $this->ProductRepository->ProductByOperator($OperatorId),);
-        
+        try{
+            $OperatorId = $request->route('id');
+            return $this->successResponse(data: $this->ProductRepository->ProductByOperator($OperatorId),);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 
@@ -664,9 +728,12 @@ class ProductController extends Controller
     public function ProductByCategory(Request $request)
     : JsonResponse
     {
-        $CategoryId = $request->route('id');
-        return $this->successResponse(data: $this->ProductRepository->getProductByCategory($CategoryId),);
-        
+        try{
+            $CategoryId = $request->route('id');
+            return $this->successResponse(data: $this->ProductRepository->getProductByCategory($CategoryId),);
+        } catch (\Exception $e) {
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        }
     }
 
 

@@ -1,20 +1,26 @@
 <?php
+use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirtimeController;
+use App\Http\Controllers\AirtimeProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillPayment;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KycController;
+use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TermConditionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -33,6 +39,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //! ---- Home ----
     Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/countries', [CountryController::class, 'index']);
+    Route::get('/country/isloan', [CountryController::class, 'isloan']);
+    Route::get('/country/country-by-phonecode/{id}', [CountryController::class, 'phoneCode']);
+
+    Route::get('/operators', [OperatorController::class, 'index']);
+    Route::get('/operators/{id}', [OperatorController::class, 'show']);
+    Route::get('/operator/by-country/{id}', [OperatorController::class, 'operatorsByCountry']);
+
+    Route::get('/product/categories', [ProductCategoryController::class, 'index']);
+    Route::get('/product/category/{id}', [ProductCategoryController::class, 'show']);
+    Route::get('/product/category-status', [ProductCategoryController::class, 'ProductCategoryStatus']);
+    Route::get('/product/categories-byoperator/{id}', [ProductCategoryController::class, 'ProductCategoryByOperator']);
 
     //! ---- KYC ----
     Route::post('kyc/verification', [KycController::class, 'verify_bvn']);
@@ -47,26 +65,31 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //! ---- Airtime Purchase ----
     Route::post('/airtime/purchase', [AirtimeController::class, 'createAirtime']);
+    Route::get('/airtime/product-category/{id}', [AirtimeProductController::class, 'AirtimeProductByCategory']);
+    Route::get('/airtime/product-operator/{id}', [AirtimeProductController::class, 'AirtimeProductByOperator']);
 
     //! ---- Data Purchase ----
     Route::post('/data/purchase', [DataController::class, 'createData']);
+    Route::get('/data/product-operator/{id}', [ProductController::class, 'ProductByOperator']);
+    Route::get('/data/product-category/{id}', [ProductController::class, 'ProductByCategory']);
+    Route::get('/data/product-by-phone/{id}', [ProductController::class, 'getProductByPhone']);
 
     //! ---- Bill Purchase ----
-    Route::post('bill/verify-meter', [BillPayment::class, 'verify_meterNo']);
+    Route::post('/bill/verify-meter', [BillPayment::class, 'verify_meterNo']);
     Route::post('/bill/payment', [BillPayment::class, 'payElectricity']);
 
 
     //! ---- Cable Purchase ----
-    Route::post('cable/verify-iuc', [BillPayment::class, 'verify_iucNo']);
+    Route::post('/cable/verify-iuc', [BillPayment::class, 'verify_iucNo']);
     Route::get('/cable/cable-plan/{id}', [BillPayment::class, 'getCablePlan']);
     Route::post('/cable/payment', [BillPayment::class, 'payCableTV']);
 
     //! ---- terms And Condition ----
     Route::prefix('term-conditions')->group(function () {
-        Route::get('/', [TermConditionController::class, 'index']);     
-        Route::post('/', [TermConditionController::class, 'store']);    
-        Route::get('{id}', [TermConditionController::class, 'show']); 
-        Route::put('{id}', [TermConditionController::class, 'update']);  
+        Route::get('/', [TermConditionController::class, 'index']);
+        Route::post('/', [TermConditionController::class, 'store']);
+        Route::get('{id}', [TermConditionController::class, 'show']);
+        Route::put('{id}', [TermConditionController::class, 'update']);
         Route::delete('{id}', [TermConditionController::class, 'destroy']);
     });
 
@@ -75,9 +98,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('faqs')->group(function () {
         Route::get('/', [FaqController::class, 'index']);
         Route::get('{id}', [FaqController::class, 'show']);
-        Route::post('/', [FaqController::class, 'store']);   
-        Route::put('{id}', [FaqController::class, 'update']); 
-        Route::delete('{id}', [FaqController::class, 'destroy']); 
+        Route::post('/', [FaqController::class, 'store']);
+        Route::put('{id}', [FaqController::class, 'update']);
+        Route::delete('{id}', [FaqController::class, 'destroy']);
     });
 
 
@@ -102,8 +125,8 @@ Route::prefix('admin')->group(function () {
     //! Protected routes (requires auth:sanctum middleware)
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::post('signout', [AdminController::class, 'signout']); 
-        Route::get('dashboard', [AdminController::class, 'admin_dashboard']); 
+        Route::post('signout', [AdminController::class, 'signout']);
+        Route::get('dashboard', [AdminController::class, 'admin_dashboard']);
     });
 });
 
