@@ -6,6 +6,7 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\RegistrationResource;
 use App\Interfaces\ProfileServiceInterface;
 use App\Models\LoanHistory;
+use App\Models\User;
 use App\Repositories\FaqRepository;
 use App\Repositories\HistoryRepository;
 use App\Repositories\NotificationRepository;
@@ -163,7 +164,7 @@ class UserController extends Controller
         ];
 
         $this->UserRepository->updateUser($uid, $userDetails);
-        return response()->json(['message' => 'Password updated successfully.']);
+        return $this->successResponse(message:'Password updated successfully.');
     }
 
     //!-- Update Pin ----
@@ -171,7 +172,7 @@ class UserController extends Controller
     {
         $uid = Auth::user()->id;
         $data = $request->validate([
-            'pin' => ['required', 'string', 'min:8', 'confirmed']
+            'pin' => ['required', 'string', 'max:4', 'confirmed']
         ]);
 
         $userDetails = [
@@ -179,7 +180,36 @@ class UserController extends Controller
         ];
 
         $this->UserRepository->updateUser($uid, $userDetails);
-        return response()->json(['message' => 'Pin updated successfully.']);
+        return $this->successResponse(message: 'Pin updated successfully.',);
+    }
+
+    //!-- Verify Pin ----
+    public function verifyPin(Request $request)
+    {
+
+        $request->validate([
+            'pin' => 'required|string|min:4|max:4',
+        ]);
+
+        $uid = Auth::user()->id;
+
+        $user = $this->UserRepository->verifyPin($uid);
+
+        $inputPin = Hash::make($request->pin);
+
+        if($user) {
+            // Check if the input PIN matches the hashed pin in the user's record
+            if (Hash::check($request->pin, $user->create_pin)) {
+                return $this->successResponse(message: 'PIN verification successful');
+            } else {
+                return $this->errorResponse(message: 'PIN does not match', code: 401,);
+            }
+        } else {
+            return $this->errorResponse(message: 'Unauthorized !!!', code: 401,);
+        }
+
+
+        
     }
 
     //!-- Update Phone Number ----

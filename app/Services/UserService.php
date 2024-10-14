@@ -66,7 +66,7 @@ class UserService implements UserServiceInterface {
         return $user;
     }
 
-    public function resetPassword(array $data) : User
+    public function resetPassword(array $data) : ?User
     {
         $user = User::where('email', $data['email'])
         ->where('otp', $data['otp'])

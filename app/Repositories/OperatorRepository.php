@@ -47,7 +47,6 @@ class OperatorRepository
     public function getOperatorByCountry($CountryIso)
     {
         return Operator::where('country_code', $CountryIso)
-                        ->groupBy('operator_code')
                         ->get();
     }
 

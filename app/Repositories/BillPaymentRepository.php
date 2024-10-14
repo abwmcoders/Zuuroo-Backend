@@ -14,7 +14,8 @@ class BillPaymentRepository
             'content' => [
                 'meterNumber' => $billDetails['billersCode'],
                 'customerName' => 'John Doe',
-                'meterType' => $billDetails['type']
+                'customerNumber' => '07034267382',
+                'meterType' => $billDetails['type'],
             ]
         ];
 
@@ -31,6 +32,7 @@ class BillPaymentRepository
             'content' => [
                 'iucNumber'    => $billDetails['billersCode'],
                 'customerName' => 'Jane Doe',
+                'customerNumber' => '08076644587',
                 'serviceID'    => $billDetails['serviceID']
             ]
         ];

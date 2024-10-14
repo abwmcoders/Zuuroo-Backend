@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RegistrationResource;
 use Illuminate\Http\Request;
 use App\Repositories\WalletRepository;
 use App\Repositories\HistoryRepository;
@@ -41,6 +42,7 @@ class HomeController extends Controller
         // Get the authenticated user information
         $uid = Auth::user()->id;
         $UserId = Auth::user()->email;
+        $user = Auth::user();
         $UserStatus = Auth::user()->status;
 
         // Gather data from various repositories and models
@@ -63,6 +65,7 @@ class HomeController extends Controller
                 ->where('user_id', $uid)
                 ->where('processing_state', '!=', 'failed')
                 ->orderBy('id', 'DESC')->get(),
+            'user' => new RegistrationResource($user),
         ];
 
         // Check user status and return appropriate response

@@ -139,6 +139,7 @@ class AuthController extends Controller
         ]);
     }
 
+
     public function resetPassword(Request $request) {
         $validatedData = $request->validate([
             'email' => 'required|string|email|max:255',
@@ -158,12 +159,20 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user->password = Hash::make($validatedData['password']);
-        $user->otp = null;
-        $user->otp_expires_at = null;
-        $user->save();
+        $userDetails = [
+            'password' => Hash::make($request->password),
+            'otp' => null,
+            'otp_expires_at' => null,
+        ];
 
-        Log::info('The found user for reset updated: ' . $user . ': ');
+        User::whereId($user->id)->update($userDetails);
+
+        // $user->password = Hash::make($validatedData['password']);
+        // $user->otp = null;
+        // $user->otp_expires_at = null;
+        // $user->save();
+
+        // Log::info('The found user for reset updated: ' . $user . ': ');
 
         return response()->json([
             'status' => true,

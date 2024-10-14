@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Interfaces\ProductCategoryRepositoryInterface;
 use App\Repositories\ProductCategoryRepository;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ProductCategoryController extends Controller
 {
+    use ApiResponseTrait;
+    
     private ProductCategoryRepository $ProductCategoryRepository;
 
     public function __construct(ProductCategoryRepository $ProductCategoryRepository)

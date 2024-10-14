@@ -35,7 +35,7 @@ class CountryRepository
 
     public function getLoanCountries()
     {
-        return Country::where('is_loan', true)->groupBy('country_code')->get();
+        return Country::where('is_loan', true)->get();
     }
 
     public function getPhoneCode($countryIso)
@@ -45,7 +45,7 @@ class CountryRepository
 
     public function CountryByStatus()
     {
-        return Country::orderBy('country_name')->groupBy('country_code')->where('status', true)->get();
+        return Country::orderBy('country_name')->where('status', true)->get();
         // Item::orderBy('name')->get(); 
     }
 

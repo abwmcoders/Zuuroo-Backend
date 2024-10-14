@@ -6,8 +6,11 @@ use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\AirtimeProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillPayment;
+use App\Http\Controllers\CablePlanController;
+use App\Http\Controllers\CableSubscriptionController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\ElectricityBillerNameController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KycController;
@@ -15,11 +18,9 @@ use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TermConditionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
-use Illuminate\Http\Request;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -32,6 +33,8 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::post('/password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
 Route::post('/password/reset', [PasswordResetController::class, 'reset']);
 
+//! ---- Countries ----
+Route::get('/countries', [CountryController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     //! ---- Logout ----
@@ -39,9 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //! ---- Home ----
     Route::get('/home', [HomeController::class, 'index']);
-    Route::get('/countries', [CountryController::class, 'index']);
     Route::get('/country/isloan', [CountryController::class, 'isloan']);
     Route::get('/country/country-by-phonecode/{id}', [CountryController::class, 'phoneCode']);
+    Route::get('/country/country-by-status', [CountryController::class, 'CountryByStatus']);
 
     Route::get('/operators', [OperatorController::class, 'index']);
     Route::get('/operators/{id}', [OperatorController::class, 'show']);
@@ -77,12 +80,30 @@ Route::middleware('auth:sanctum')->group(function () {
     //! ---- Bill Purchase ----
     Route::post('/bill/verify-meter', [BillPayment::class, 'verify_meterNo']);
     Route::post('/bill/payment', [BillPayment::class, 'payElectricity']);
+    Route::get('/bill/electricity-billers', [ElectricityBillerNameController::class, 'getAll']);
+    Route::get('/bill/electricity-billers/status/{status}', [ElectricityBillerNameController::class, 'getByStatus']);
 
 
     //! ---- Cable Purchase ----
     Route::post('/cable/verify-iuc', [BillPayment::class, 'verify_iucNo']);
     Route::get('/cable/cable-plan/{id}', [BillPayment::class, 'getCablePlan']);
     Route::post('/cable/payment', [BillPayment::class, 'payCableTV']);
+
+    //!------------------ cable providers--------------
+    Route::get('/cable-subscriptions', [CableSubscriptionController::class, 'index']);
+    Route::post('/cable-subscriptions', [CableSubscriptionController::class, 'store']);
+    Route::get('/cable-subscriptions/{id}', [CableSubscriptionController::class, 'show']);
+    Route::put('/cable-subscriptions/{id}', [CableSubscriptionController::class, 'update']);
+    Route::delete('/cable-subscriptions/{id}', [CableSubscriptionController::class, 'destroy']);
+    Route::get('/cable-subscriptions/status/{status}', [CableSubscriptionController::class, 'getByStatus']);
+
+    //!---------------cable plans -------------------
+    Route::get('/cable-plans', [CablePlanController::class, 'index']);
+    Route::post('/cable-plans', [CablePlanController::class, 'store']);
+    Route::get('/cable-plans/{id}', [CablePlanController::class, 'show']);
+    Route::put('/cable-plans/{id}', [CablePlanController::class, 'update']);
+    Route::delete('/cable-plans/{id}', [CablePlanController::class, 'destroy']);
+    Route::get('/cable-plans/provider/{provider_code}', [CablePlanController::class, 'getByProviderCode']);
 
     //! ---- terms And Condition ----
     Route::prefix('term-conditions')->group(function () {
@@ -105,13 +126,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     //! ---- User Activities ----
-    Route::get('/faqs', [UserController::class, 'faqs']);
-    Route::get('/loans', [UserController::class, 'loans']);
-    Route::get('/out-loans', [UserController::class, 'outLoans']);
+    Route::get('/user/faqs', [UserController::class, 'faqs']);
+    Route::get('/user/loans', [UserController::class, 'loans']);
+    Route::get('/user/out-loans', [UserController::class, 'outLoans']);
     Route::get('/user-loan-receipt/{id}', [UserController::class, 'userLoanReceipt']);
-    Route::put('/update-password', [UserController::class, 'updatePassword']);
-    Route::put('/update-pin', [UserController::class, 'updatePin']);
+    Route::put('/user/update-password', [UserController::class, 'updatePassword']);
+    Route::put('/user/update-pin', [UserController::class, 'updatePin']);
     Route::put('/update-phone', [UserController::class, 'updatePhoneNumber']);
+    Route::post('/user/verify-pin', [UserController::class, 'verifyPin']);
 });
 
 
@@ -121,8 +143,6 @@ Route::post('/admin/register', [AdminController::class, 'create']);
 Route::post('/admin/login', [AdminController::class, 'login']);
 
 Route::prefix('admin')->group(function () {
-
-    //! Protected routes (requires auth:sanctum middleware)
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('signout', [AdminController::class, 'signout']);

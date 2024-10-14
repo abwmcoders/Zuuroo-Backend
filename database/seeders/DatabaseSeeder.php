@@ -34,6 +34,14 @@ class DatabaseSeeder extends Seeder
             LoanHistorySeeder::class,
             RecurringChargeSeeder::class,
             ProductSeeder::class,
+            CountriesTableSeeder::class,
+            OperatorsTableSeeder::class,
+            ProductsTableSeeder::class,
+            RecurringChargesSeeder::class,
+            KycSeeder::class,
+            ElectricityBillerNameSeeder::class,
+            CableSubscriptionSeeder::class,
+            CablePlanSeeder::class,
         ]);
     }
 }

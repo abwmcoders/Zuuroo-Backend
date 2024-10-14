@@ -11,5 +11,5 @@ interface UserServiceInterface
     public function login(array $data): string;
     public function verifyOtp(array $data): User;
     public function requestPasswordReset(array $data): User;
-    public function resetPassword(array $data): User;
+    public function resetPassword(array $data): ?User;
 }

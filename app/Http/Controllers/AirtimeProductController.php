@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\AirtimeProductRepository as RepositoriesAirtimeProductRepository;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -10,6 +11,7 @@ use Illuminate\Http\Response;
 
 class AirtimeProductController extends Controller
 {
+    use ApiResponseTrait;
 
     private RepositoriesAirtimeProductRepository $AirtimeProductRepository;
 

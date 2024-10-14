@@ -222,7 +222,7 @@ class AirtimeController extends Controller
                                         return $this->errorResponse(message: 'Insufficient fund !!!',);
                                     }else{
 
-                                        $new_bal_process = $req_bal_process - $amount;
+                                        $new_bal_process = (float) $req_bal_process - (float)$amount;
                                         $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
 
                                         if($this->WalletRepository->updateWallet($uid, $walletDetails) )
@@ -303,7 +303,7 @@ class AirtimeController extends Controller
                                             if($Kyc->verificationStatus == 1)
                                             {
                                                 if($LoanCountry){
-                                                    if($req_bal_process >= 100){
+                                                    if($req_loanBal_process >= 100){
                                                         return $this->errorResponse(message: 'Your Balance Is Still High, You Cannot Loan At This Time !!!',);
                                                     }else{
                                                         // Processing Loan Nigeria Data

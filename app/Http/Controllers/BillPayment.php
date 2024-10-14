@@ -82,7 +82,7 @@ class BillPayment extends Controller
                 $request = json_decode($response);
 
                 return response()->json([
-                    'success'       => false,
+                    'success'       => true,
                     'statusCode'    => 200,
                     'data'          => $request->content,
                     'message'       => 'Meter Number Verified'
@@ -118,7 +118,7 @@ class BillPayment extends Controller
                 $request = json_decode($response);
 
                 return response()->json([
-                    'success'       => false,
+                    'success'       => true,
                     'statusCode'    => 200,
                     'data'          => $request->content,
                     'message'       => 'IUC Number Verified'

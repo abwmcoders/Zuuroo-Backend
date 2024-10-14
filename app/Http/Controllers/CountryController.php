@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Interfaces\CountryRepositoryInterface;
 use App\Repositories\CountryRepository;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,6 +12,7 @@ use Illuminate\Http\Response;
 
 class CountryController extends Controller
 {
+    use ApiResponseTrait;
     private CountryRepository $CountryRepository;
 
     public function __construct(CountryRepository $CountryRepository)
@@ -22,9 +24,8 @@ class CountryController extends Controller
     : JsonResponse
     {
         try{
-            return response()->json([
-                'data' => $this->CountryRepository->getAllCountries()
-            ]);
+            return $this->successResponse(data: $this->CountryRepository->getAllCountries(),);
+            
         } catch (\Exception $e) {
             return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
@@ -101,9 +102,8 @@ class CountryController extends Controller
     : JsonResponse
     {
         try{
-            return response()->json([
-                'data' => $this->CountryRepository->getLoanCountries()
-            ]);
+            return $this->successResponse(data: $this->CountryRepository->getLoanCountries(),);
+            
         } catch (\Exception $e) {
             return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }

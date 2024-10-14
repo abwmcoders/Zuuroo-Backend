@@ -35,6 +35,11 @@ class UserRepository
         return User::whereId($UserId)->update($newDetails);
     }
 
+    public function verifyPin($UserId)
+    {
+        return User::whereId($UserId)->first();
+    }
+
     public function getActiveUser()
     {
         return User::where('email_verifies_at', true);

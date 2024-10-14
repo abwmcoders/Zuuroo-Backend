@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\OperatorRepository;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class OperatorController extends Controller
 {
+    use ApiResponseTrait;
+    
     /**
      * Display a listing of the resource.
      *
@@ -120,9 +123,8 @@ class OperatorController extends Controller
     {
         try{
             $CountryIso = $request->route('id');
-            return response()->json([
-                'data' => $this->OperatorRepository->getOperatorByCountry($CountryIso)
-            ]);
+            return $this->successResponse(data: $this->OperatorRepository->getOperatorByCountry($CountryIso),);
+           
         } catch (\Exception $e) {
             return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
