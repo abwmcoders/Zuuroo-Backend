@@ -12,6 +12,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\ElectricityBillerNameController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KycController;
 use App\Http\Controllers\OperatorController;
@@ -122,6 +123,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [FaqController::class, 'store']);
         Route::put('{id}', [FaqController::class, 'update']);
         Route::delete('{id}', [FaqController::class, 'destroy']);
+    });
+
+    //! ---- History ----
+    Route::controller(HistoryController::class)->group(function () {
+        Route::get('histories', 'index');
+        Route::get('histories/{id}', 'show');
+        Route::post('histories', 'store');
+        Route::put('histories/{id}', 'update');
+        Route::delete('histories/{id}', 'destroy');
+
+        Route::get('histories/data', 'getDataHistories');
+        Route::get('histories/airtime', 'getAirtimeHistories');
+        Route::get('user/{userId}/histories', 'getUserHistory');
+        Route::get('user/{userId}/histories/{purchase}', 'getUserPurchaseHistory'); 
     });
 
 

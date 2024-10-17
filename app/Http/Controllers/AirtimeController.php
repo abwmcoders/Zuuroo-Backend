@@ -193,9 +193,9 @@ class AirtimeController extends Controller
 
                                         } else {
 
-                                            // $new_bal_process = $req_bal_process + $amount;
-                                            // $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
-                                            // $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                            $new_bal_process = $req_bal_process + $amount;
+                                            $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                            $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                             return response()->json([
                                                 'success'       => false,

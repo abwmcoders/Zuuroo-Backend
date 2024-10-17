@@ -10,29 +10,49 @@ class HistoryRepository
 {
     public function getAllHistories()
     {
-        $histories = History::join('operators', 'histories.operator_code', 'operators.operator_code')
-                            ->join('countries', 'histories.country_code', 'countries.country_code')
-                            ->select(
-                                'histories.id as history_id', // Use an alias to distinguish between IDs
-                                'histories.plan',
-                                'histories.phone_number',
-                                'histories.selling_price',
-                                'histories.receive_currency',
-                                'histories.purchase',
-                                'histories.transfer_ref',
-                                'histories.selling_price',
-                                'histories.receive_value',
-                                'histories.commission_applied',
-                                'histories.processing_state',
-                                'histories.created_at',
-                                 DB::raw('CAST(histories.created_at AS DATETIME) as created_at'), // Cast created_at to DATETIME
-                                'operators.operator_name',
-                                'countries.country_name'
-                            )
-                            ->groupBy('history_id')
-                            ->distinct()
-                            ->orderBy('histories.id', 'desc')
-                            ->get();
+        // $histories = History::join('operators', 'histories.operator_code', 'operators.operator_code')
+        //                     ->join('countries', 'histories.country_code', 'countries.country_code')
+        //                     ->select(
+        //                         'histories.id as history_id', // Use an alias to distinguish between IDs
+        //                         'histories.plan',
+        //                         'histories.phone_number',
+        //                         'histories.selling_price',
+        //                         'histories.receive_currency',
+        //                         'histories.purchase',
+        //                         'histories.transfer_ref',
+        //                         'histories.selling_price',
+        //                         'histories.receive_value',
+        //                         'histories.commission_applied',
+        //                         'histories.processing_state',
+        //                         'histories.created_at',
+        //                          DB::raw('CAST(histories.created_at AS DATETIME) as created_at'), // Cast created_at to DATETIME
+        //                         'operators.operator_name',
+        //                         'countries.country_name'
+        //                     )
+        //                     ->groupBy('history_id')
+        //                     ->distinct()
+        //                     ->orderBy('histories.id', 'desc')
+        //                     ->get();
+        $histories = History::
+        //join('operators', 'histories.operator_code', '=', 'operators.operator_code')
+       // ->join('countries', 'histories.country_code', '=', 'countries.country_code')
+        // ->select(
+        //     'histories.id as history_id',
+        //     DB::raw('MAX(histories.plan) as plan'),
+        //     'histories.phone_number',
+        //     'histories.selling_price',
+        //     'histories.receive_currency',
+        //     'histories.purchase',
+        //     'histories.transfer_ref',
+        //     'histories.receive_value',
+        //     'histories.commission_applied',
+        //     'histories.processing_state',
+        //     'operators.operator_name',
+        //     'countries.country_name'
+        // )
+        //->groupBy('history_id', 'histories.phone_number', 'operators.operator_name', 'countries.country_name')
+        orderBy('histories.id', 'desc')
+        ->get();
             return $histories->sortByDesc('created_at');
 
 
