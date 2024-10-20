@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\FaqRepository;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
+    use ApiResponseTrait;
     private $faqRepository;
 
     public function __construct(FaqRepository $faqRepository)
@@ -18,7 +20,7 @@ class FaqController extends Controller
     public function index()
     {
         $faqs = $this->faqRepository->getAllFaqs();
-        return response()->json($faqs, 200);
+        return $this->successResponse(data: $faqs);
     }
 
     // Get a specific FAQ by ID
