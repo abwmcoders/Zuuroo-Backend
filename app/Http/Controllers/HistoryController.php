@@ -6,6 +6,7 @@ use App\Repositories\HistoryRepository;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class HistoryController extends Controller
 {
@@ -100,16 +101,47 @@ class HistoryController extends Controller
     }
 
     // 8. Get User-Specific History
-    public function getUserHistory(int $userId): JsonResponse
+    public function getUserHistory(): JsonResponse
     {
-        $userHistories = $this->historyRepository->getAllHistoryByUser($userId);
-        return response()->json($userHistories);
+        $id = Auth::user()->id;
+        //$userHistories = $this->historyRepository->getAllHistoryByUser($id);
+        $userHistories = $this->historyRepository->getHistoryByUser($id);
+        return $this->successResponse(data: $userHistories);
     }
 
     // 9. Get User-Specific Purchase History
-    public function getUserPurchaseHistory(string $purchase, int $userId): JsonResponse
+    public function getUserPurchaseHistory(string $purchase): JsonResponse
     {
-        $purchaseHistories = $this->historyRepository->getPurchaseHistoryByUser($purchase, $userId);
-        return response()->json($purchaseHistories);
+        $id = Auth::user()->id;
+        $purchaseHistories = $this->historyRepository->getPurchaseHistoryByUser($purchase, $id);
+        return $this->successResponse(data: $purchaseHistories); 
+        
+    }
+
+    // 9. Get User-Specific Purchase History
+    public function getUserProcessingStateHistory(string $state): JsonResponse
+    {
+        $id = Auth::user()->id;
+        $purchaseHistories = $this->historyRepository->getProcessingStateHistoryByUser($state, $id);
+        return $this->successResponse(data: $purchaseHistories); 
+        
+    }
+
+    public function getByPurchase(Request $request)
+    {
+        $purchase = $request->input('purchase');
+
+        $histories = $this->historyRepository->getByPurchase($purchase);
+
+        return $this->successResponse(data: $histories,);
+    }
+
+    public function getByProcessingState(Request $request)
+    {
+        $state = $request->input('state');
+
+        $histories = $this->historyRepository->getByProcessingState($state);
+
+        return $this->successResponse(data: $histories,);
     }
 }

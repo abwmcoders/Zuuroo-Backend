@@ -8,6 +8,14 @@ use App\Models\History;
 
 class HistoryRepository
 {
+    protected $model;
+
+    public function __construct(History $history)
+    {
+        $this->model = $history;
+    }
+
+
     public function getAllHistories()
     {
         // $histories = History::join('operators', 'histories.operator_code', 'operators.operator_code')
@@ -124,9 +132,42 @@ class HistoryRepository
                         ->get();
     }
 
+    public function getHistoryByUser($UserId)
+    {
+        return History::
+        //join('operators', 'histories.operator_code', 'operators.operator_code')
+                        where('user_id', $UserId)
+                        //->where('purchase', $Purchase)
+                        //->select('histories.plan', 'histories.phone_number', 'histories.selling_price', 'histories.receive_currency', 'histories.purchase', 'histories.transfer_ref', 'histories.selling_price', 'histories.receive_value', 'histories.commission_applied', 'histories.processing_state', 'histories.created_at', 'operators.operator_name', 'operators.country_code')
+                        //->groupby('histories.transfer_ref')
+                        ->orderBy('histories.created_at', 'desc')
+                        ->get();
+    }
+
+    public function getProcessingStateHistoryByUser($state, $UserId)
+    {
+        return History::join('operators', 'histories.operator_code', 'operators.operator_code')
+                        ->where('user_id', $UserId)
+                        ->where('processing_state', $state)
+                        ->select('histories.plan', 'histories.phone_number', 'histories.selling_price', 'histories.receive_currency', 'histories.purchase', 'histories.transfer_ref', 'histories.selling_price', 'histories.receive_value', 'histories.commission_applied', 'histories.processing_state', 'histories.created_at', 'operators.operator_name', 'operators.country_code')
+                        ->groupby('histories.transfer_ref')
+                        ->orderBy('histories.created_at', 'desc')
+                        ->get();
+    }
+
     public function getHistoryById($HistoryId)
     {
         return History::findOrFail($HistoryId);
+    }
+
+    public function getByPurchase($purchase)
+    {
+        return $this->model->where('purchase', $purchase)->get();
+    }
+
+    public function getByProcessingState($state)
+    {
+        return $this->model->where('purchase', $state)->get();
     }
 
     public function getHistoryByPurchase($HistoryId)

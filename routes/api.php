@@ -144,8 +144,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('histories/data', 'getDataHistories');
         Route::get('histories/airtime', 'getAirtimeHistories');
-        Route::get('user/{userId}/histories', 'getUserHistory');
-        Route::get('user/{userId}/histories/{purchase}', 'getUserPurchaseHistory'); 
+        Route::get('user/histories', 'getUserHistory');
+        Route::get('histories/{purchase}', 'getUserPurchaseHistory');
+        Route::get('histories/{status}', 'getUserProcessingStateHistory'); 
     });
 
 
