@@ -17,6 +17,7 @@ use App\Repositories\DataRepository;
 use App\Repositories\HistoryRepository;
 use App\Repositories\KycRepository;
 use App\Repositories\LoanHistoryRepository;
+use Illuminate\Support\Str;
 
 class KycController extends Controller
 {
@@ -52,21 +53,30 @@ class KycController extends Controller
             'dd'           => 'required',
             'mm'           => 'required',
             'yy'           => 'required',
-            'Phone_Number' => 'required',
+            //'Phone_Number' => 'required',
         ]);
+
+        $id = Auth::user()->id;
+        $country = Auth::user()->country;
+        $number = Auth::user()->mobile;
         // dd($request->all() );
         $bvnNumber          = $request->bvn;
         $firstName          = $request->firstname;
         $lastName           = $request->lastname;
         $middleName         = $request->middlename;
+
+        $references = [];
+        for ($i = 0; $i < 10; $i++) {
+            $references[] = Str::upper(Str::random(12)); // Example: A1B2C3D4
+        }
         
         
         $fullName           = strtoupper($lastName .' '. $firstName .' '. $middleName);
-        $phoneNumber        = $request->Phone_Number;
+        $phoneNumber        = $number; //request->Phone_Number;
         $dateOfBirth        = $request->dd .'-'. $request->mm .'-'. $request->yy;
-        $uid                = $request->user_id;
-        $ucc                = $request->user_country;
-        $transaction_ref    = $request->transaction_ref;
+        $uid                = $id;//$request->user_id;
+        $ucc                = $country; //$request->user_country;
+        $transaction_ref    = $references; //request->transaction_ref;
         
         // CHeck existig KYC -------------------------------------------------------------------------------------------------
         $Kyc = Kyc::where('user_id', $uid )->first();

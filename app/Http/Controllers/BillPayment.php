@@ -331,8 +331,9 @@ class BillPayment extends Controller
                                                             $HistoryDetails = [
                                                                 'user_id'               => $request->userID,
                                                                 'purchase'              => 'electricity',
-                                                                'api_mode'              => 'Vtpass',
-                                                                'plan'                  => $response['content']['transactions']['type'],
+                                                                'country_code'          =>  "NG",
+                                                                //'api_mode'              => 'Vtpass',
+                                                                'operator_code'         => $response['content']['transactions']['type'],
                                                                 'product_code'          => $response['content']['transactions']['product_name'],
                                                                 'transfer_ref'          => $response['requestId'],
                                                                 'phone_number'          => $response['content']['transactions']['phone'],
@@ -343,6 +344,10 @@ class BillPayment extends Controller
                                                                 'commission_applied'    => $response['content']['transactions']['commission'],
                                                                 'processing_state'      => $response['content']['transactions']['status'],
                                                                 'send_value'            => $response['content']['transactions']['total_amount'],
+                                                                'receive_value'         => $request->amount,
+                                                                'cost_price'            => $response['content']['transactions']['total_amount'],
+                                                                'startedUtc'            =>  NOW(),
+                                                                'completedUtc'          =>  Now(), //$createNigData->create_date,
                                                             ]; //1111111111111
 
                                                             $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
@@ -503,8 +508,10 @@ class BillPayment extends Controller
                                 $HistoryDetails = [
                                     'user_id'               => $request->userID,
                                     'purchase'              => 'cable',
-                                    'api_mode'              => 'Vtpass',
-                                    'plan'                  => $response['content']['transactions']['type'],
+                                    //'api_mode'              => 'Vtpass',
+                                    'country_code'          =>  "NG",
+                                   // 'operator_code'         =>  $request->cableName,
+                                    'operator_code'                  => $response['content']['transactions']['type'],
                                     'product_code'          => $response['content']['transactions']['product_name'],
                                     'transfer_ref'          => $response['requestId'],
                                     'phone_number'          => $response['content']['transactions']['phone'],
@@ -515,6 +522,10 @@ class BillPayment extends Controller
                                     'commission_applied'    => $response['content']['transactions']['commission'],
                                     'processing_state'      => $response['content']['transactions']['status'],
                                     'send_value'            => $response['content']['transactions']['total_amount'],
+                                    'receive_currency'      =>  'NGN',
+                                    'receive_value'         =>  $amount,
+                                    'startedUtc'            =>  NOW(),
+                                    'completedUtc'          => NOW(),  //$createNigData->create_date,
                                 ]; //1111111111111
                                 // return $HistoryDetails;
                                 $createHistory = $this->HistoryRepository->createHistory( $HistoryDetails );

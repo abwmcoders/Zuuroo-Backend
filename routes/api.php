@@ -21,6 +21,7 @@ use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TermConditionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
@@ -133,6 +134,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('about-us', [AboutUsController::class, 'store']);
     Route::put('about-us/{id}', [AboutUsController::class, 'update']);
     Route::delete('about-us/{id}', [AboutUsController::class, 'destroy']);
+
+
+    //! ---- Support ---------
+    Route::get('/supports', [SupportController::class, 'index']);
+    Route::post('/supports', [SupportController::class, 'store']);
+    Route::put('/supports/{id}', [SupportController::class, 'update']);
+    Route::delete('/supports/{id}', [SupportController::class, 'destroy']);
 
     //! ---- History ----
     Route::controller(HistoryController::class)->group(function () {
