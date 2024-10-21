@@ -222,32 +222,81 @@ class UserController extends Controller
 
         $userDetails = [
             'mobile' => $request->phoneNumber,
-            'number_verify_at' => null
+            'number_verify_at' => now()
         ];
 
         $this->UserRepository->updateUser($uid, $userDetails);
         return $this->successResponse(message: 'Phone number updated successfully.',);
     }
 
-    
+
     //!---- Update Profile ------
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = Auth::user();
+        try {
+            // Get the authenticated user ID
+            $userId = Auth::id(); // Simplified method to get user ID
 
-        $validatedData = $request->validated();
+            // Validate the incoming request data
+            $validatedData = $request->validated();
 
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            // Prepare user details for the update
+            $userDetails = [
+                'name'     => $validatedData['name'] ?? null,
+                'email'    => $validatedData['email'] ?? null,
+                'mobile'   => $validatedData['mobile'] ?? null,
+                'username' => $validatedData['username'] ?? null,
+                'address'  => $validatedData['address'] ?? null,
+                'dob'      => $validatedData['dob'] ?? null,
+                'gender'   => $validatedData['gender'] ?? null,
+            ];
+
+            // Perform the update using UserRepository
+            $updatedUser = $this->UserRepository->updateUser($userId, $userDetails);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Profile successfully updated',
+                'data'    => new RegistrationResource($updatedUser),
+            ], 200);
+        } catch (\Exception $e) {
+            // Handle any errors or exceptions
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to update profile',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        $updatedUser = $this->profileService->updateProfile($user, $validatedData);
-        return response()->json([
-            'status' => true,
-            'message' => 'Profile successfully updated',
-            'data' => new RegistrationResource($updatedUser)
-        ]);
     }
+
+    // public function updateProfile(UpdateProfileRequest $request)
+    // {
+    //     $uid = Auth::user()->id;
+
+    //     $validatedData = $request->validated();
+
+    //     // if (!$user) {
+    //     //     return response()->json(['message' => 'Unauthorized'], 401);
+    //     // }
+        
+    //     $userDetails = [
+    //         'name' => $request->name,
+    //         'email' => $request->email,
+    //         'mobile' => $request->mobile,
+    //         'username' => $request->username,
+    //         'address' => $request->address,
+    //         'dob' => $request->dob,
+    //         'gender' => $request->gender,
+    //     ];
+
+    //     //$updatedUser = $this->profileService->updateProfile($user, $validatedData);
+    //     $updatedUser = $this->UserRepository->updateUser($uid, $userDetails);
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Profile successfully updated',
+    //         'data' => new RegistrationResource($updatedUser)
+    //     ]);
+    // }
 
 
 }

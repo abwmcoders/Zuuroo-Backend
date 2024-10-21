@@ -25,13 +25,13 @@ class UpdateProfileRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $this->user()->id,
             'mobile' => 'nullable|string|max:255',
-            'telephone' => 'nullable|numeric',
+            //'telephone' => 'nullable|numeric',
             'dob' => 'nullable|date|date_format:Y-m-d',
             'username' => 'required|string|max:255|unique:users,username,' . $this->user()->id,
             'gender' => 'nullable|string|in:male,female,other',
             'address' => 'nullable|string|max:255',
-            'zipcode' => 'nullable|string|max:10',
-            'country' => 'nullable|string|max:255',
+            // 'zipcode' => 'nullable|string|max:10',
+            // 'country' => 'nullable|string|max:255',
         ];
     }
 
