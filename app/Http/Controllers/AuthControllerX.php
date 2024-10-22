@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Resources\RegistrationResource;
+use App\Interfaces\UserServiceInterface;
 use App\Mail\OtpMail;
 use App\Models\User;
 use App\Repositories\ActivityRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WalletRepository;
-use App\Services\UserService;
 use App\Traits\ApiResponseTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class AuthController extends Controller
 
     protected $userService;
 
-    public function __construct(UserService $userService,WalletRepository $WalletRepository, ActivityRepository $ActivityRepository, UserRepository $UserRepository)
+    public function __construct(UserServiceInterface $userService,WalletRepository $WalletRepository, ActivityRepository $ActivityRepository, UserRepository $UserRepository)
     {
         $this->userService = $userService;
 
@@ -92,42 +92,27 @@ class AuthController extends Controller
     }
 
 
-    public function verifyOtp( Request $request) 
-    {
-        try {
-            
-            $validatedData = $request->validate([
-                'email' => 'required|string|email|max:255',
-                'otp'   => 'required|digits:6',
-            ]);
-            
-            $email  = $request->email;
-            $otp    = $request->otp;
-            
-            $user   = $this->userService->getUserByEmail($email);
-            // $user = $this->userService->verifyOtp($validatedData);
-            
-    
-            if ($user->otp != $otp && $user->otp_expires_at != Carbon::now()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Invalid OTP or OTP expired.'
-                ], 400);
-            }
-    
-            $user->email_verified_at = now();
-            $user->otp = null;
-            $user->otp_expires_at = null;
-            $user->save();
+    public function verifyOtp( Request $request) {
+        $validatedData = $request->validate([
+            'email' => 'required|string|email|max:255',
+            'otp' => 'required|digits:6',
+        ]);
 
-            return $this->successResponse(message: 'Email verified successfully.',);
-        } catch (\Exception $e) {
-            
+        $user = $this->userService->verifyOtp($validatedData);
+
+        if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => 'Internal Server Error !!!'
-            ], 500);
+                'message' => 'Invalid OTP or OTP expired.'
+            ], 400);
         }
+
+        $user->email_verified_at = now();
+        $user->otp = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        return $this->successResponse(message: 'Email verified successfully.',);
     }
 
     public function requestPasswordReset( Request $request) {

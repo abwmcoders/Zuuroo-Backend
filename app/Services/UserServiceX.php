@@ -49,11 +49,6 @@ class UserService implements UserServiceInterface {
         $user = Auth::user();
         return $user->createToken('authToken')->plainTextToken;
     }
-    
-    public function getUserByEmail($email)
-    {
-        return User::where('email', $email)->first();
-    }
 
     public function verifyOtp(array $data) : User
     {
@@ -81,4 +76,6 @@ class UserService implements UserServiceInterface {
         return $user;
     }
 
+    
+    
 }
