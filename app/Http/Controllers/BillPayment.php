@@ -64,36 +64,28 @@ class BillPayment extends Controller
     public function verify_meterNo(Request $request)
     // : JsonResponse
     {
-        try{
             $Validator = Validator::make($request->all(), [
-                'billersCode' => ['required'],
-                'serviceID'   => ['required'],
+                'meterNumber' => ['required'],
+                'discoName'   => ['required'],
                 'meterType'   => ['required']
             ]);
 
-            $billersCode =   $request->billersCode;
-            $serviceID  =   $request->serviceID;
+            $meterNumber =   $request->meterNumber;
+            $discoName  =   $request->discoName;
             $meterType  =   strtolower($request->meterType);
 
             // Log::debug(['Error:' => $billersCode, $serviceID, $meterType ]);
 
             if ($Validator->passes()) {
                 $billDetails = [
-                    'billersCode'   => $billersCode,
-                    'serviceID'     => $serviceID,
+                    'billerNumber'   => $meterNumber,
+                    'disco'     => $discoName,
                     'type'          => $meterType
 
                 ];
 
                 $response = $this->BillPaymentRepository->verifyMeterNumber($billDetails);
-                $request = json_decode($response);
-
-                return response()->json([
-                    'success'       => true,
-                    'statusCode'    => 200,
-                    'data'          => $request->content,
-                    'message'       => 'Meter Number Verified'
-                ]);
+            return response()->json($response);
             } else {
                 return response()->json([
                     'statusCode' => 400,
@@ -101,35 +93,26 @@ class BillPayment extends Controller
                     'message'   => 'Check All Input Fields !!!',
                 ]);
             }
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
-        }
+       
     }
 
     public function verify_iucNo(Request $request)
     {
-        try{
             $Validator = Validator::make($request->all(), [
-                'billersCode' => ['required'],
-                'serviceID'   => ['required']
+                'iucNumber' => ['required'],
+                'cableName'   => ['required']
             ]);
 
 
             if ($Validator->passes()) {
                 $billDetails = [
-                    'billersCode'   => $request->billersCode,
-                    'serviceID'     => $request->serviceID,
+                    'iuc'   => $request->iucNumber,
+                    'cable'     => $request->cableName,
                 ];
 
-                $response = $this->BillPaymentRepository->verifyIUCNumber($billDetails);
-                $request = json_decode($response);
-
-                return response()->json([
-                    'success'       => true,
-                    'statusCode'    => 200,
-                    'data'          => $request->content,
-                    'message'       => 'IUC Number Verified'
-                ]);
+            $response = $this->BillPaymentRepository->verifyIUCNumber($billDetails);
+            return response()->json($response);
+                
             } else {
                 return response()->json([
                     'statusCode' => 400,
@@ -137,9 +120,6 @@ class BillPayment extends Controller
                     'message'   => 'Check All Input Fields !!!',
                 ]);
             }
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
-        }
     }
 
     // Getting Cable TV Plans
@@ -171,12 +151,12 @@ class BillPayment extends Controller
     // : JsonResponse
     {
 
-        try{
+        // try{
             date_default_timezone_set("Africa/Lagos");
             // echo date_default_timezone_get();
             $requestID = date('YmdHi').rand(99, 9999999);
 
-            $uid = $request->userID;//Auth::user()->id;
+            $uid = Auth::user()->id;
             $req_Account_process = $this->WalletRepository->getWalletBalance($uid);
             $req_bal_process = $req_Account_process->balance;
             $req_loanBal_process    = $req_Account_process->loan_balance;
@@ -234,56 +214,58 @@ class BillPayment extends Controller
                                                             'phone'             => $phoneNumber,
                                                         ];
                                                         $response = $this->BillPaymentRepository->payElectricity($billDetails);
+                            return response()->json($response);
+                            //!TODO: STORE TO HISTORY
                                                         // return $response;
-                                                        if ($response['code'] == "016") //000
-                                                        {
+                                                        // if ($response['status'] == true) //000
+                                                        // {
 
-                                                            $HistoryDetails = [
-                                                                'user_id'               => $request->userID,
-                                                                'purchase'              => 'electricity',
-                                                                'api_mode'              => 'Vtpass',
-                                                                'plan'                  => $response['content']['transactions']['type'],
-                                                                'product_code'          => $response['content']['transactions']['product_name'],
-                                                                'transfer_ref'          => $response['requestId'],
-                                                                'phone_number'          => $response['content']['transactions']['phone'],
-                                                                'distribe_ref'          => $response['content']['transactions']['transactionId'],
-                                                                'selling_price'         => $response['content']['transactions']['amount'],
-                                                                'description'           => 'Delivered',
-                                                                'deviceNo'              => $request->meterNumber,
-                                                                'commission_applied'    => $response['content']['transactions']['commission'],
-                                                                'processing_state'      => $response['content']['transactions']['status'],
-                                                                'send_value'            => $response['content']['transactions']['total_amount'],
-                                                            ]; //1111111111111
+                                                        //     $HistoryDetails = [
+                                                        //         'user_id'               => $request->userID,
+                                                        //         'purchase'              => 'electricity',
+                                                        //         'api_mode'              => 'Vtpass',
+                                                        //         'plan'                  => $response['content']['transactions']['type'],
+                                                        //         'product_code'          => $response['content']['transactions']['product_name'],
+                                                        //         'transfer_ref'          => $response['requestId'],
+                                                        //         'phone_number'          => $response['content']['transactions']['phone'],
+                                                        //         'distribe_ref'          => $response['content']['transactions']['transactionId'],
+                                                        //         'selling_price'         => $response['content']['transactions']['amount'],
+                                                        //         'description'           => 'Delivered',
+                                                        //         'deviceNo'              => $request->meterNumber,
+                                                        //         'commission_applied'    => $response['content']['transactions']['commission'],
+                                                        //         'processing_state'      => $response['content']['transactions']['status'],
+                                                        //         'send_value'            => $response['content']['transactions']['total_amount'],
+                                                        //     ]; //1111111111111
 
-                                                            $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
-                                                            if ($createHistory) {
+                                                        //     $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
+                                                        //     if ($createHistory) {
 
-                                                                return response()->json([
-                                                                    'success'       => true,
-                                                                    'statusCode'    => 200,
-                                                                    'message'       => 'You\'ve Successfully Purchased A Biller'
-                                                                ]);
-                                                            } else {
+                                                        //         return response()->json([
+                                                        //             'success'       => true,
+                                                        //             'statusCode'    => 200,
+                                                        //             'message'       => 'You\'ve Successfully Purchased A Biller'
+                                                        //         ]);
+                                                        //     } else {
 
-                                                                return response()->json([
-                                                                    'success'       => false,
-                                                                    'statusCode'    => 500,
-                                                                    'message'       => 'Internal Server Error'
-                                                                ]);
-                                                            }
-                                                        } else {
+                                                        //         return response()->json([
+                                                        //             'success'       => false,
+                                                        //             'statusCode'    => 500,
+                                                        //             'message'       => 'Internal Server Error'
+                                                        //         ]);
+                                                        //     }
+                                                        // } else {
 
-                                                            // Failed Transaction Auto Refund User Wallet
-                                                            $new_bal_process = $req_bal_process + $request->amount;
-                                                            $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
-                                                            $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                                        //     // Failed Transaction Auto Refund User Wallet
+                                                        //     $new_bal_process = $req_bal_process + $request->amount;
+                                                        //     $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                                                        //     $this->WalletRepository->updateWallet($uid, $walletDetails);
 
-                                                            return response()->json([
-                                                                'success'       => false,
-                                                                'statusCode'    => 500,
-                                                                'message'       => 'But Your wallet has not been debited'
-                                                            ]);
-                                                        }
+                                                        //     return response()->json([
+                                                        //         'success'       => false,
+                                                        //         'statusCode'    => 500,
+                                                        //         'message'       => 'But Your wallet has not been debited'
+                                                        //     ]);
+                                                        // }
                                                     }
 
                         } else if ($request->top_up == 2) {
@@ -315,70 +297,79 @@ class BillPayment extends Controller
                                                         $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                                         $this->WalletRepository->updateWallet($uid, $walletDetails);
 
+                                                        // $billDetails = [
+                                                        //     'request_id'        => $requestID,
+                                                        //     'serviceID'         => $request->billerName, //'eko-electric',
+                                                        //     'variation_code'    => $request->meterType, //'prepaid',
+                                                        //     'billersCode'       => $request->meterNumber,
+                                                        //     'amount'            => $request->amount,
+                                                        //     'phone'             => $phoneNumber,
+                                                        // ];
+
                                                         $billDetails = [
-                                                            'request_id'        => $requestID,
-                                                            'serviceID'         => $request->billerName, //'eko-electric',
-                                                            'variation_code'    => $request->meterType, //'prepaid',
-                                                            'billersCode'       => $request->meterNumber,
+                                                            //'request_id'        => $requestID,
+                                                            'disco_name'         => $request->billerName, //'eko-electric',
+                                                            'MeterType'    => $request->meterType === 'prepaid' ? 1 : 2, //'prepaid',
+                                                            'meter_number'       => $request->meterNumber,
                                                             'amount'            => $request->amount,
-                                                            'phone'             => $phoneNumber,
+                                                            //'phone'             => $phoneNumber,
                                                         ];
                                                         $response = $this->BillPaymentRepository->payElectricity($billDetails);
-                                                        // return $response;
-                                                        if ($response['code'] == "016") //000
-                                                        {
+                                                        return response()->json($response);
+                                                        //!TODO: STORE TO HISTORY
+                                                        // if ($response['status'] == true) //000 --- success
+                                                        // {
+                                                        //     $HistoryDetails = [
+                                                        //         'user_id'               => $request->userID,
+                                                        //         'purchase'              => 'electricity',
+                                                        //         'country_code'          =>  "NG",
+                                                        //         //'api_mode'              => 'Vtpass',
+                                                        //         'operator_code'         => $response['content']['transactions']['type'],
+                                                        //         'product_code'          => $response['content']['transactions']['product_name'],
+                                                        //         'transfer_ref'          => $response['requestId'],
+                                                        //         'phone_number'          => $response['content']['transactions']['phone'],
+                                                        //         'distribe_ref'          => $response['content']['transactions']['transactionId'],
+                                                        //         'selling_price'         => $response['content']['transactions']['amount'],
+                                                        //         'description'           => 'Delivered',
+                                                        //         'deviceNo'              => $request->meterNumber,
+                                                        //         'commission_applied'    => $response['content']['transactions']['commission'],
+                                                        //         'processing_state'      => $response['content']['transactions']['status'],
+                                                        //         'send_value'            => $response['content']['transactions']['total_amount'],
+                                                        //         'receive_value'         => $request->amount,
+                                                        //         'cost_price'            => $response['content']['transactions']['total_amount'],
+                                                        //         'startedUtc'            =>  NOW(),
+                                                        //         'completedUtc'          =>  Now(), //$createNigData->create_date,
+                                                        //     ]; //1111111111111
 
-                                                            $HistoryDetails = [
-                                                                'user_id'               => $request->userID,
-                                                                'purchase'              => 'electricity',
-                                                                'country_code'          =>  "NG",
-                                                                //'api_mode'              => 'Vtpass',
-                                                                'operator_code'         => $response['content']['transactions']['type'],
-                                                                'product_code'          => $response['content']['transactions']['product_name'],
-                                                                'transfer_ref'          => $response['requestId'],
-                                                                'phone_number'          => $response['content']['transactions']['phone'],
-                                                                'distribe_ref'          => $response['content']['transactions']['transactionId'],
-                                                                'selling_price'         => $response['content']['transactions']['amount'],
-                                                                'description'           => 'Delivered',
-                                                                'deviceNo'              => $request->meterNumber,
-                                                                'commission_applied'    => $response['content']['transactions']['commission'],
-                                                                'processing_state'      => $response['content']['transactions']['status'],
-                                                                'send_value'            => $response['content']['transactions']['total_amount'],
-                                                                'receive_value'         => $request->amount,
-                                                                'cost_price'            => $response['content']['transactions']['total_amount'],
-                                                                'startedUtc'            =>  NOW(),
-                                                                'completedUtc'          =>  Now(), //$createNigData->create_date,
-                                                            ]; //1111111111111
+                                                        //     $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
+                                                        //     if ($createHistory) {
 
-                                                            $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
-                                                            if ($createHistory) {
+                                                        //         return response()->json([
+                                                        //             'success'       => true,
+                                                        //             'statusCode'    => 200,
+                                                        //             'message'       => 'You\'ve Successfully Purchased A Biller'
+                                                        //         ]);
+                                                        //     } else {
 
-                                                                return response()->json([
-                                                                    'success'       => true,
-                                                                    'statusCode'    => 200,
-                                                                    'message'       => 'You\'ve Successfully Purchased A Biller'
-                                                                ]);
-                                                            } else {
+                                                        //         return response()->json([
+                                                        //             'success'       => false,
+                                                        //             'statusCode'    => 500,
+                                                        //             'message'       => 'Internal Server Error'
+                                                        //         ]);
+                                                        //     }
+                                                        // } else {
 
-                                                                return response()->json([
-                                                                    'success'       => false,
-                                                                    'statusCode'    => 500,
-                                                                    'message'       => 'Internal Server Error'
-                                                                ]);
-                                                            }
-                                                        } else {
+                                                        //     // Failed Transaction Auto Refund User Wallet
+                                                        //     $new_bal_process = $req_bal_process + $request->amount;
+                                                        //     $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                                                        //     $this->WalletRepository->updateWallet($uid, $walletDetails);
 
-                                                            // Failed Transaction Auto Refund User Wallet
-                                                            $new_bal_process = $req_bal_process + $request->amount;
-                                                            $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
-                                                            $this->WalletRepository->updateWallet($uid, $walletDetails);
-
-                                                            return response()->json([
-                                                                'success'       => false,
-                                                                'statusCode'    => 500,
-                                                                'message'       => 'But Your wallet has not been debited'
-                                                            ]);
-                                                        }
+                                                        //     return response()->json([
+                                                        //         'success'       => false,
+                                                        //         'statusCode'    => 500,
+                                                        //         'message'       => 'But Your wallet has not been debited'
+                                                        //     ]);
+                                                        // }
                                                     }
 
 
@@ -417,16 +408,16 @@ class BillPayment extends Controller
                     'message'   => 'Check All Input Fields !!!',
                 ]);
             }
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
-        }
+        // } catch (\Exception $e) {
+        //     return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        // }
 
     }
 
     // PayCable TV
     public function payCableTV(Request $request)
     {
-        try{
+        // try{
             $Validator = Validator::make($request->all(), [
                 'top_up'            =>  'required',
                 'cableName'             => 'required|string',
@@ -442,16 +433,16 @@ class BillPayment extends Controller
                 // echo date_default_timezone_get();
                 $requestID          = date('YmdHi').rand(99, 9999999);
                 $planId             = $request->cablePlan;
-                $uid                = $request->userID;//Auth::user()->id;
+                $uid                = Auth::user()->id;
                 $req_Account_process= $this->WalletRepository->getWalletBalance($uid);
                 $req_bal_process    = $req_Account_process->balance;
                 $req_loanBal_process    = $req_Account_process->loan_balance;
                 $user               = $this->UserRepository->getUserById($uid);
                 $LoanCountry            = Country::where('is_loan', true)->where('country_code', $request->country)->get();
 
-                $selectplanDetail = OtherProduct::where('variation_code', $planId)->first();
-                $amount = $selectplanDetail->variation_amount;
-                $variationCode = $selectplanDetail->variation_code;
+                // $selectplanDetail = OtherProduct::where('variation_code', $planId)->first();
+                // $amount = $selectplanDetail->variation_amount;
+                // $variationCode = $selectplanDetail->variation_code;
 
                 // -------------------------------- KYC --------------------------------------------------------------------------------------
                 $Kyc = Kyc::where('user_id', $uid)->first();
@@ -491,17 +482,27 @@ class BillPayment extends Controller
                             $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
                             $this->WalletRepository->updateWallet($uid, $walletDetails);
 
+                            // $billDetails = [
+                            //     'request_id'        => $requestID,
+                            //     'serviceID'         => $request->cableName,//'eko-electric',
+                            //     'billersCode'       => $request->cableNumber,
+                            //     'variation_code'    => $variationCode,//'prepaid',
+                            //     'amount'            => $amount,
+                            //     'phone'             => $request->customerPhoneNumber,
+                            //     'subscription_type' => 'change'
+                            // ];
+
                             $billDetails = [
-                                'request_id'        => $requestID,
-                                'serviceID'         => $request->cableName,//'eko-electric',
-                                'billersCode'       => $request->cableNumber,
-                                'variation_code'    => $variationCode,//'prepaid',
-                                'amount'            => $amount,
-                                'phone'             => $request->customerPhoneNumber,
-                                'subscription_type' => 'change'
+                                'cablename'         => $request->cableName, //'eko-electric',
+                                'smart_card_number'       => $request->cableNumber,
+                                'cableplan'    => $request->cablePlan,//'prepaid',
+                               
                             ];
                             $response = $this->BillPaymentRepository->payCableTV($billDetails);
+                            return response()->json($response);
                             // return $response;
+
+                            //! TODO:
                             if($response['code'] == 016) //000
                             {
 
@@ -597,8 +598,8 @@ class BillPayment extends Controller
                                                             'request_id'        => $requestID,
                                                             'serviceID'         => $request->cableName, //'eko-electric',
                                                             'billersCode'       => $request->cableNumber,
-                                                            'variation_code'    => $variationCode, //'prepaid',
-                                                            'amount'            => $amount,
+                                                            'variation_code'    =>  '', // $variationCode, 'prepaid',
+                                                            'amount'            =>  '', //$amount,
                                                             'phone'             => $request->customerPhoneNumber,
                                                             'subscription_type' => 'change'
                                                         ];
@@ -692,9 +693,9 @@ class BillPayment extends Controller
                     'message'   => 'Check All Input Fields !!!',
                 ]);
             }
-        } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
-        }
+        // } catch (\Exception $e) {
+        //     return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        // }
 
     }
 

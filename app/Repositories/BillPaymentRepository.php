@@ -2,42 +2,86 @@
 
 namespace App\Repositories;
 
+use Illuminate\Support\Facades\Http;
 
 class BillPaymentRepository
 {
+
     public function verifyMeterNumber(array $billDetails)
     {
-        //:TODO MAke Request to api call
-        $response = [
-            'status' => 'success',
-            'message' => 'Meter number verified successfully',
-            'content' => [
-                'meterNumber' => $billDetails['billersCode'],
-                'customerName' => 'John Doe',
-                'customerNumber' => '07034267382',
-                'meterType' => $billDetails['type'],
-            ]
+        $url = 'https://alrahuzdata.com.ng/api/validatemeter';
+        $headers = [
+            'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
+            'Content-Type'  => 'application/json',
         ];
 
-        return json_encode($response);
+        $queryParams = [
+            'meternumber' => $billDetails['billerNumber'],
+            'disconame'   => $billDetails['disco'],
+            'mtype'       => $billDetails['type'],
+        ];
+        try {
+            $response = Http::withHeaders($headers)->get($url, $queryParams);
+
+            if ($response->successful()) {
+                return [
+                    'status' => 'true',
+                    'message' => 'Meter number verified successfully',
+                    'data' => $response->json(),
+                ];
+            }
+
+            return [
+                'status' => 'false',
+                'message' => 'Failed to verify meter number',
+                'data' => $response->body(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'false',
+                'message' => 'An error occurred during the request',
+                'data' => $e->getMessage(),
+            ];
+        }
+    
     }
 
     public function verifyIUCNumber(array $billDetails)
     {
-        //:TODO MAke Request to api call
-
-        $response = [
-            'status' => 'success',
-            'message' => 'IUC number verified successfully',
-            'content' => [
-                'iucNumber'    => $billDetails['billersCode'],
-                'customerName' => 'Jane Doe',
-                'customerNumber' => '08076644587',
-                'serviceID'    => $billDetails['serviceID']
-            ]
+        $url = 'https://alrahuzdata.com.ng/api/validateiuc';
+        $headers = [
+            'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
+            'Content-Type'  => 'application/json',
         ];
 
-        return json_encode($response);
+        $queryParams = [
+            'smart_card_number' => $billDetails['iuc'],
+            'cablename'   => $billDetails['cable'],
+        ];
+        try {
+            $response = Http::withHeaders($headers)->get($url, $queryParams);
+
+            if ($response->successful()) {
+                return [
+                    'status' => 'true',
+                    'message' => 'IUC number verified successfully',
+                    'data' => $response->json(),
+                ];
+            }
+
+            return [
+                'status' => 'false',
+                'message' => 'Failed to verify IUC number',
+                'data' => $response->body(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'false',
+                'message' => 'An error occurred during the request',
+                'data' => $e->getMessage(),
+            ];
+        }
+    
     }
 
     public function getCablePlan($cableId)
@@ -61,55 +105,85 @@ class BillPaymentRepository
         return $cablePlans[$cableId] ?? ['error' => 'Cable Plan not found'];
     }
 
-    public function payElectricity(array $billDetails)
+    public function payElectricity(array $paymentDetails)
     {
-        //:TODO MAke Request to api call
-
-
-        $response = [
-            'code' => '016',
-            'content' => [
-                'transactions' => [
-                    'type' => 'Electricity Payment',
-                    'product_name' => 'EKO Electric',
-                    'phone' => $billDetails['phone'],
-                    'transactionId' => '123456789',
-                    'amount' => $billDetails['amount'],
-                    'commission' => '₦50',
-                    'status' => 'Delivered',
-                    'total_amount' => $billDetails['amount'] + 50
-                ]
-            ],
-            'requestId' => $billDetails['request_id']
+        $url = 'https://alrahuzdata.com.ng/api/billpayment/';
+        $headers = [
+            'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
+            'Content-Type'  => 'application/json',
         ];
 
-        return $response;
+        try {
+            $response = Http::withHeaders($headers)
+                ->post($url, $paymentDetails);
+            if ($response->successful()) {
+                return [
+                    'status' => true,
+                    'message' => 'Payment successful',
+                    'data' => $response->json(),
+                ];
+            }
+
+            return [
+                'status' => false,
+                'message' => 'Payment failed',
+                'data' => $this->formatErrorResponse($response->body())
+                ,
+            ];
+
+        }
+        catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'An error occurred while processing the payment',
+                'data' => $e->getMessage(),
+            ];
+        }
     }
 
-    public function payCableTV(array $billDetails)
+    public function payCableTV(array $paymentDetails)
     {
-        //:TODO MAke Request to api call
-
-
-        $response = [
-            'code' => 016,
-            'content' => [
-                'transactions' => [
-                    'type' => 'Cable TV Payment',
-                    'product_name' => 'DSTV Compact Plus',
-                    'phone' => $billDetails['phone'],
-                    'transactionId' => '123456789',
-                    'amount' => $billDetails['amount'],
-                    'commission' => '₦50',
-                    'status' => 'Delivered',
-                    'total_amount' => $billDetails['amount'] + 50
-                ]
-            ],
-            'requestId' => $billDetails['request_id'],
-            'response_description' => 'Transaction successful'
+        $url = 'https://alrahuzdata.com.ng/api/cablesub/';
+        $headers = [
+            'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
+            'Content-Type'  => 'application/json',
         ];
 
-        return $response;
+        try {
+            $response = Http::withHeaders($headers)
+                ->post($url, $paymentDetails);
+            if ($response->successful()) {
+                return [
+                    'status' => true,
+                    'message' => 'Payment successful',
+                    'data' => $response->json(),
+                ];
+            }
+
+            return [
+                'status' => false,
+                'message' => 'Payment failed',
+                'data' => $this->formatErrorResponse($response->body()),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'An error occurred while processing the payment',
+                'data' => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function formatErrorResponse($jsonString)
+    {
+        $decoded = json_decode($jsonString, true);
+
+        if (isset($decoded['error']) && is_array($decoded['error'])) {
+            $errorMessage = implode(', ', $decoded['error']);
+
+            return "error: $errorMessage";
+        }
+        return "No error found.";
     }
 
     public function ResulCheckerRepository(){}

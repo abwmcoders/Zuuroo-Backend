@@ -80,19 +80,15 @@ class PaystackController extends Controller
 
     // public function verifyWebhookPaystack(Request $request)
     // {
-
     //     $body = $request->all();
-
     //     // Log::debug('An informational message.');
     //     // Log::debug(['Data Received' => $body]) ;
     //      //amount //email prevent multiple pending payments
     //     // $email = $request->input('data.customer.email');
     //     // $amountpaid = ($request->input('data.amount'))/100;
-
     //     // $user_id = User::where('email', $email)->firstOrFail()->id;
     //     // $user = User::find($user_id);
     //     // Log::error($email);
-
     //     $response = json_encode($body);
     //     $data = json_decode($response);
     //     if ($data->event == "charge.success") {
@@ -193,7 +189,6 @@ class PaystackController extends Controller
     public function verifyWebhookPaystack(Request $request)
     {
         try {
-            
             $body = $request->all();
             Log::info('Webhook request received', ['body' => $body]);
     
