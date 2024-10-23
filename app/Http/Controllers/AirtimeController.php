@@ -104,8 +104,6 @@ class AirtimeController extends Controller
                                     'network_operator'  =>  'required',
                                     'amount'            =>  'required'
                                 ]);
-
-
                                 // Processing Nigeria Data
                                 if($request->country == 'NG'){
                                     if($req_bal_process < $amount){

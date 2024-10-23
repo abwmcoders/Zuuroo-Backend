@@ -21,8 +21,68 @@ class CategoriesTableSeeder extends Seeder
                 'status' => 1
             ],
             [
+                'operator_code' => 'VZ',
+                'category_name' => 'Mobile Data2',
+                'category_code' => 'DATA',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'VZ',
+                'category_name' => 'Mobile Data3',
+                'category_code' => 'DATA',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'VZ',
+                'category_name' => 'Mobile Data4',
+                'category_code' => 'DATA',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'VZ',
+                'category_name' => 'Mobile Data5',
+                'category_code' => 'DATA',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'VZ',
+                'category_name' => 'Mobile Data6',
+                'category_code' => 'DATA',
+                'status' => 1
+            ],
+            [
                 'operator_code' => 'MTN',
                 'category_name' => 'Airtime Recharge',
+                'category_code' => 'AIRTIME',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'MTN',
+                'category_name' => 'Airtime Recharge2',
+                'category_code' => 'AIRTIME',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'MTN',
+                'category_name' => 'Airtime Recharge3',
+                'category_code' => 'AIRTIME',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'MTN',
+                'category_name' => 'Airtime Recharge4',
+                'category_code' => 'AIRTIME',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'MTN',
+                'category_name' => 'Airtime Recharge5',
+                'category_code' => 'AIRTIME',
+                'status' => 1
+            ],
+            [
+                'operator_code' => 'MTN',
+                'category_name' => 'Airtime Recharge6',
                 'category_code' => 'AIRTIME',
                 'status' => 1
             ],

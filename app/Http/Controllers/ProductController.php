@@ -232,6 +232,46 @@ class ProductController extends Controller
         }
     }
 
+    public function getProductsByFilter(Request $request)
+    {
+        // Fetch query parameters from request
+        $categoryCode = $request->query('category_code');
+        $operatorCode = $request->query('operator_code');
+
+        // Build the query dynamically
+        $query = Product::query();
+
+        if ($categoryCode && $operatorCode) {
+            // Retrieve products where either category_code or operator_code matches
+            $query->where('category_code', $categoryCode)
+            ->orWhere('operator_code', $operatorCode);
+        } elseif ($categoryCode) {
+            // Filter only by category_code if provided
+            $query->where('category_code', $categoryCode);
+        } elseif ($operatorCode) {
+            // Filter only by operator_code if provided
+            $query->where('operator_code', $operatorCode);
+        }
+
+        // Execute the query and get results
+        $products = $query->get();
+
+        // Check if data is found
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No products found.',
+                'data' => [],
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Products retrieved successfully.',
+            'data' => $products,
+        ]);
+    }
+
 
 
 

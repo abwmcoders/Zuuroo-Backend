@@ -17,6 +17,8 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KycController;
+use App\Http\Controllers\LoanLimitController;
+use App\Http\Controllers\MaxLimitController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductCategoryController;
@@ -59,6 +61,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/product/category-status', [ProductCategoryController::class, 'ProductCategoryStatus']);
     Route::get('/product/categories-byoperator/{id}', [ProductCategoryController::class, 'ProductCategoryByOperator']);
 
+    Route::get('/product/plan', [ProductController::class, 'getProductsByFilter']);
+
     //! ---- KYC ----
     Route::post('kyc/verification', [KycController::class, 'verify_bvn']);
 
@@ -66,22 +70,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify')->middleware(['signed']);
     Route::post('/email/resend', [VerificationController::class, 'resend'])->middleware(['throttle:6,1']);
 
-    //! ---- Profile ----
+    //! ---- Profile -------------
     Route::get('/profile', [UserController::class, 'userProfile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
 
-    //! ---- Airtime Purchase ----
+    //! ---- Airtime Purchase ------------
     Route::post('/airtime/purchase', [AirtimeController::class, 'createAirtime']);
     Route::get('/airtime/product-category/{id}', [AirtimeProductController::class, 'AirtimeProductByCategory']);
     Route::get('/airtime/product-operator/{id}', [AirtimeProductController::class, 'AirtimeProductByOperator']);
 
-    //! ---- Data Purchase ----
+    //! ---- Data Purchase --------------
     Route::post('/data/purchase', [DataController::class, 'createData']);
     Route::get('/data/product-operator/{id}', [ProductController::class, 'ProductByOperator']);
     Route::get('/data/product-category/{id}', [ProductController::class, 'ProductByCategory']);
     Route::get('/data/product-by-phone/{id}', [ProductController::class, 'getProductByPhone']);
 
-    //! ---- Bill Purchase ----
+    //! ---- Bill Purchase ---------------
     Route::post('/bill/verify-meter', [BillPayment::class, 'verify_meterNo']);
     Route::post('/bill/payment', [BillPayment::class, 'payElectricity']);
     Route::get('/bill/electricity-billers', [ElectricityBillerNameController::class, 'getAll']);
@@ -108,6 +112,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cable-plans/{id}', [CablePlanController::class, 'update']);
     Route::delete('/cable-plans/{id}', [CablePlanController::class, 'destroy']);
     Route::get('/cable-plans/provider/{provider_code}', [CablePlanController::class, 'getByProviderCode']);
+
+    //!---------------Max Limit -------------------
+    Route::get('/max-limits', [MaxLimitController::class, 'index']);
+    Route::get('/max-limits/{id}', [MaxLimitController::class, 'show']);
+    Route::post('/max-limits', [MaxLimitController::class, 'store']);
+    Route::put('/max-limits/{id}', [MaxLimitController::class, 'update']);
+    Route::delete('/max-limits/{id}', [MaxLimitController::class, 'destroy']);
+
+    //!---------------Loan Limit -------------------
+    Route::get('/loan-limits', [LoanLimitController::class, 'index']);
+    Route::get('/loan-limits/{id}', [LoanLimitController::class, 'show']);
+    Route::post('/loan-limits', [LoanLimitController::class, 'store']);
+    Route::put('/loan-limits/{id}', [LoanLimitController::class, 'update']);
+    Route::delete('/loan-limits/{id}', [LoanLimitController::class, 'destroy']);
 
     //! ---- terms And Condition ----
     Route::prefix('term-conditions')->group(function () {

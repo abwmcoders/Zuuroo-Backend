@@ -118,9 +118,7 @@ class ProductCategoryController extends Controller
     {
         try{
             $OperatorId = $request->route('id');
-            return response()->json([
-                'data' => $this->ProductCategoryRepository->getProductCategoryByOperator($OperatorId)
-            ]);
+            return $this->successResponse(data: $this->ProductCategoryRepository->getProductCategoryByOperator($OperatorId));
         } catch (\Exception $e) {
             return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
