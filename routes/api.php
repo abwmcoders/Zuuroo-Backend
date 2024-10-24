@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AboutUsController;
 use Illuminate\Support\Facades\Route;
 
@@ -148,7 +149,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     //! ---- About us ---------
-    Route::get('about-us', [AboutUsController::class, 'index']);
     Route::post('about-us', [AboutUsController::class, 'store']);
     Route::put('about-us/{id}', [AboutUsController::class, 'update']);
     Route::delete('about-us/{id}', [AboutUsController::class, 'destroy']);
@@ -186,6 +186,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/update-phone', [UserController::class, 'updatePhoneNumber']);
     Route::post('/user/verify-pin', [UserController::class, 'verifyPin']);
 });
+
+//! ---- About us ---------
+Route::get('about-us', [AboutController::class, 'index']);
 
 
 //! ---- Admin Activities ---------------------------------------------------------------------------------------
