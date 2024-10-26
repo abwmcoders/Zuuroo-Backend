@@ -14,16 +14,17 @@ class ElectricityBillerNameSeeder extends Seeder
     public function run(): void
     {
         $discos = [
-            ['biller_name' => 'Ikeja Electric', 'biller_code' => 'IKEJA', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Eko Electricity Distribution Company', 'biller_code' => 'EKO', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Abuja Electricity Distribution Company', 'biller_code' => 'ABUJA', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Kano Electricity Distribution Company', 'biller_code' => 'KANO', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Port Harcourt Electricity Distribution Company', 'biller_code' => 'PH', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Ibadan Electricity Distribution Company', 'biller_code' => 'IBADAN', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Jos Electricity Distribution Company', 'biller_code' => 'JOS', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Kaduna Electricity Distribution Company', 'biller_code' => 'KADUNA', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Benin Electricity Distribution Company', 'biller_code' => 'BENIN', 'country_code' => 'NG', 'status' => 1],
-            ['biller_name' => 'Enugu Electricity Distribution Company', 'biller_code' => 'ENUGU', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Ikeja Electric', 'biller_code' => '1', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Eko Electric', 'biller_code' => '2', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Abuja Electric', 'biller_code' => '3', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Kano Electric', 'biller_code' => '4', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Enugu Electric', 'biller_code' => '5', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Port Harcourt Electric', 'biller_code' => '6', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Ibadan Electric', 'biller_code' => '7', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Kaduna Electric', 'biller_code' => '8', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Jos Electric', 'biller_code' => '9', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Benin Electric', 'biller_code' => '10', 'country_code' => 'NG', 'status' => 1],
+            ['biller_name' => 'Yola Electric', 'biller_code' => '11', 'country_code' => 'NG', 'status' => 1],
         ];
 
         DB::table('electricity_biller_names')->insert($discos);

@@ -253,27 +253,26 @@ class AuthController extends Controller
                 "getAllAvailableBanks" => true
             ];
 
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $this->getToken(),
-            //     'Content-Type' => 'application/json'
-            // ])->post($this->monnify_baseUrl . '/api/v2/bank-transfer/reserved-accounts', $details);
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Content-Type' => 'application/json'
+            ])->post($this->monnify_baseUrl . '/api/v2/bank-transfer/reserved-accounts', $details);
 
-            // $return_data = json_decode($response);
+            $return_data = json_decode($response);
 
-            //if (isset($return_data->requestSuccessful) && $return_data->requestSuccessful == true) {
-            if (true) {
-                // foreach ($return_data->responseBody->accounts as $account) {
-                //     $bankDetails['res_reference'] = $return_data->responseBody->reservationReference;
-                //     $bankDetails['user_name'] = $return_data->responseBody->customerEmail;
-                //     $bankDetails['user_email'] = $return_data->responseBody->customerName;
-                //     $bankDetails['account_name'] = $account->accountName;
-                //     $bankDetails['account_number'] = $account->accountNumber;
-                //     $bankDetails['bank_name'] = $account->bankName;
-                //     $bankDetails['bank_code'] = $account->bankCode;
-                //     $bankDetails['account_status'] = $return_data->responseBody->status;
+            if (isset($return_data->requestSuccessful) && $return_data->requestSuccessful == true) {
+                foreach ($return_data->responseBody->accounts as $account) {
+                    $bankDetails['res_reference'] = $return_data->responseBody->reservationReference;
+                    $bankDetails['user_name'] = $return_data->responseBody->customerEmail;
+                    $bankDetails['user_email'] = $return_data->responseBody->customerName;
+                    $bankDetails['account_name'] = $account->accountName;
+                    $bankDetails['account_number'] = $account->accountNumber;
+                    $bankDetails['bank_name'] = $account->bankName;
+                    $bankDetails['bank_code'] = $account->bankCode;
+                    $bankDetails['account_status'] = $return_data->responseBody->status;
 
-                //     $this->UserRepository->createUserAccountDetails($bankDetails);
-                // }
+                    $this->UserRepository->createUserAccountDetails($bankDetails);
+                }
 
                 $user = User::create([
                     'name' => $data['name'],

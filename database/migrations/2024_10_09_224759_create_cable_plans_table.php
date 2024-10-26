@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('plan');            
             $table->string('price');            
-            $table->json('channels');          
             $table->string('provider_code');  
             $table->timestamps();
         });

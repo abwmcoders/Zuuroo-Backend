@@ -12,7 +12,6 @@ class CablePlan extends Model
     protected $fillable = [
         'plan',
         'price',
-        'channels',
         'provider_code',
     ];
 

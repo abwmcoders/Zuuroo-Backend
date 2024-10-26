@@ -23,7 +23,7 @@ class BillPaymentRepository
         try {
             $response = Http::withHeaders($headers)->get($url, $queryParams);
 
-            if ($response->successful()) {
+            if ($response['invalid'] === false) {
                 return [
                     'status' => 'true',
                     'message' => 'Meter number verified successfully',
@@ -61,7 +61,7 @@ class BillPaymentRepository
         try {
             $response = Http::withHeaders($headers)->get($url, $queryParams);
 
-            if ($response->successful()) {
+            if ($response['invalid'] === false) {
                 return [
                     'status' => 'true',
                     'message' => 'IUC number verified successfully',
