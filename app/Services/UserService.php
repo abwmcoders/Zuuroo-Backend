@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\UserServiceInterface;
 use App\Mail\OtpMail;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -31,24 +32,41 @@ class UserService implements UserServiceInterface {
         return $user;
     }
 
-    public function login(array $data) : string {
-        if (!Auth::attempt($data)) {
-            throw new \Exception('Invalid credentials');
+    public function login(array $data)
+    {
+        $loginField = filter_var($data['email'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        // Prepare the credentials array for authentication
+        $authCredentials = [
+            $loginField => $data['email'],
+            'password' => $data['password'],
+        ];
+
+        if (Auth::attempt($authCredentials)) {
+            $user = Auth::user();
+
+            /** @var User $user */
+
+            return $user->createToken('auth_token')->plainTextToken;
         }
 
-        /** @var User $user */
-
-        $user = Auth::user();
-
-        if (!$user->hasVerifiedEmail()) {
-            throw new \Exception('Email not verified.');
-        }
-
-        /** @var User $user */
-
-        $user = Auth::user();
-        return $user->createToken('authToken')->plainTextToken;
+        // Throw an exception if authentication fails
+        throw new Exception('Invalid login credentials.');
     }
+
+    // public function login(array $data) : string {
+    //     if (!Auth::attempt($data)) {
+    //         throw new \Exception('Invalid credentials');
+    //     }
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     if (!$user->hasVerifiedEmail()) {
+    //         throw new \Exception('Email not verified.');
+    //     }
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     return $user->createToken('authToken')->plainTextToken;
+    // }
     
     public function getUserByEmail($email)
     {
