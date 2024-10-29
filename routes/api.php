@@ -108,6 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //!---------------cable plans -------------------
     Route::get('/cable-plans', [CablePlanController::class, 'index']);
+    Route::get('/cableplans-by-provider/{id}', [CablePlanController::class, 'plansByProvider']);
     Route::post('/cable-plans', [CablePlanController::class, 'store']);
     Route::get('/cable-plans/{id}', [CablePlanController::class, 'show']);
     Route::put('/cable-plans/{id}', [CablePlanController::class, 'update']);
@@ -172,7 +173,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('histories/airtime', 'getAirtimeHistories');
         Route::get('user/histories', 'getUserHistory');
         Route::get('histories/{purchase}', 'getUserPurchaseHistory');
-        Route::get('histories/{status}', 'getUserProcessingStateHistory'); 
+        Route::get('histories/{status}', 'getUserProcessingStateHistory');
     });
 
 

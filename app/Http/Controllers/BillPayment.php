@@ -93,7 +93,7 @@ class BillPayment extends Controller
                     'message'   => 'Check All Input Fields !!!',
                 ]);
             }
-       
+
     }
 
     public function verify_iucNo(Request $request)
@@ -112,7 +112,7 @@ class BillPayment extends Controller
 
             $response = $this->BillPaymentRepository->verifyIUCNumber($billDetails);
             return response()->json($response);
-                
+
             } else {
                 return response()->json([
                     'statusCode' => 400,
@@ -419,7 +419,7 @@ class BillPayment extends Controller
     {
         // try{
             $Validator = Validator::make($request->all(), [
-                'top_up'            =>  'required',
+                'top_up'                =>  'required',
                 'cableName'             => 'required|string',
                 'cablePlan'             => 'required|string',
                 'cableNumber'           => 'required|numeric',
@@ -494,9 +494,9 @@ class BillPayment extends Controller
 
                             $billDetails = [
                                 'cablename'         => $request->cableName, //'eko-electric',
-                                'smart_card_number'       => $request->cableNumber,
-                                'cableplan'    => $request->cablePlan,//'prepaid',
-                               
+                                'smart_card_number' => $request->cableNumber,
+                                'cableplan'         => $request->cablePlan,//'prepaid',
+
                             ];
                             $response = $this->BillPaymentRepository->payCableTV($billDetails);
                             return response()->json($response);
@@ -676,7 +676,7 @@ class BillPayment extends Controller
                         } else {
                             return $this->errorResponse(message: 'Invalid Selection, Please Make a Choice !!!', code: 500,);
                         }
-                        
+
                     }else{
                         // return 'Invalif PIN !!!';
                         return response()->json([
