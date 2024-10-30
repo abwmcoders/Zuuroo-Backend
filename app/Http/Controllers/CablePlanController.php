@@ -15,6 +15,11 @@ class CablePlanController extends Controller
         return response()->json(CablePlan::all(), 200);
     }
 
+    public function  plansByProvider($id)
+    {
+        return response()->json(CablePlan::where('provider_code', $id)->get(), 200);
+    }
+
     // Create a new plan
     public function store(Request $request)
     {
