@@ -22,6 +22,7 @@ use App\Http\Controllers\LoanLimitController;
 use App\Http\Controllers\MaxLimitController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupportController;
@@ -46,6 +47,10 @@ Route::get('/countries', [CountryController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     //! ---- Logout ----
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //! ---- Payment ----
+    Route::post('/payment/initialize', [PaymentController::class, 'initializePayment']);
+    Route::get('/payment/verify', [PaymentController::class, 'verifyTransaction']); 
 
     //! ---- Home ----
     Route::get('/home', [HomeController::class, 'index']);

@@ -103,8 +103,10 @@ class AirtimeController extends Controller
                                     'amount'            =>  'required'
                                 ]);
                                 // Processing Nigeria Data
-                                if ($request->country == 'NG') {
-                                    if ($req_bal_process < $amount) {
+                                if($request->country == 'NG'){
+                                    $req_bal_process = (float) $req_bal_process;
+                                    $amount = (float) $amount; 
+                                    if($req_bal_process < $amount){
                                         return $this->errorResponse(message: 'Insufficient fund !!!',);
                                     } else {
 
