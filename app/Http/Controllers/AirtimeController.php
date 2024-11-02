@@ -66,6 +66,7 @@ class AirtimeController extends Controller
             $req_loanBal_process    = $req_Account_process->loan_balance;
             $user                   = $this->UserRepository->getUserById($uid);
             $LoanCountry            = Country::where('is_loan', true)->where('country_code', $request->country)->get();
+            
 
             // GLNG | MTNG | ZANG | ETNG
 
@@ -74,6 +75,7 @@ class AirtimeController extends Controller
             $network        = strip_tags($request->network_operator);
             $customer_ref   = 'ZR_' . rand(99, 999999);
             $actAmt         = strip_tags($request->amount);
+            $plan           = $network . ' Airtim VTU';
 
             // -------------------------------- KYC --------------------------------------------------------------------------------------
             $Kyc = Kyc::where('user_id', $uid)->first();
@@ -154,7 +156,7 @@ class AirtimeController extends Controller
                                                 // ...........................................................................
                                                 $HistoryDetails = [
                                                     'user_id'               =>  $uid,
-                                                    'plan'                  =>  $createNigData->paid_amount,
+                                                    'plan'                  =>  $plan,
                                                     'purchase'              =>  'Airtime',
                                                     'country_code'          =>  $request->country,
                                                     'operator_code'         =>  $network,
@@ -162,9 +164,9 @@ class AirtimeController extends Controller
                                                     'transfer_ref'          =>  $createNigData->ident,
                                                     'phone_number'          =>  $createNigData->mobile_number,
                                                     'distribe_ref'          =>  $customer_ref,
-                                                    'selling_price'         =>  $amount,
-                                                    'cost_price'            =>  $actAmt,
-                                                    'receive_value'         =>  $amount,
+                                                    'selling_price'         =>  $actAmt,
+                                                    'cost_price'            =>  $createNigData->paid_amount,
+                                                    'receive_value'         =>  $actAmt,
                                                     'send_value'            =>  $actAmt,
                                                     'receive_currency'      =>  'NGN',
                                                     'commission_applied'    =>  0,
@@ -316,9 +318,10 @@ class AirtimeController extends Controller
                                                                     // $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                                                     // Store returned data in DB
+                                                                    
                                                                     $HistoryDetails = [
                                                                         'user_id'               =>  $uid,
-                                                                        'plan'                  =>  $createNigData->paid_amount,
+                                                                        'plan'                  =>  $plan,
                                                                         'purchase'              =>  'Airtime',
                                                                         'country_code'          =>  $request->country,
                                                                         'operator_code'         =>  $network,
@@ -326,9 +329,9 @@ class AirtimeController extends Controller
                                                                         'transfer_ref'          =>  $createNigData->ident,
                                                                         'phone_number'          =>  $createNigData->mobile_number,
                                                                         'distribe_ref'          =>  $customer_ref,
-                                                                        'selling_price'         =>  $amount,
-                                                                        'cost_price'            =>  $actAmt,
-                                                                        'receive_value'         =>  $amount,
+                                                                        'selling_price'         =>  $actAmt,
+                                                                        'cost_price'            =>  $createNigData->paid_amount,
+                                                                        'receive_value'         =>  $actAmt,
                                                                         'send_value'            =>  $actAmt,
                                                                         'receive_currency'      =>  'NGN',
                                                                         'commission_applied'    =>  0,
