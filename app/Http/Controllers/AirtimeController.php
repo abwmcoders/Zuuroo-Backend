@@ -29,7 +29,7 @@ use App\Traits\ApiResponseTrait;
 class AirtimeController extends Controller
 {
 
-    use ApiResponseTrait; 
+    use ApiResponseTrait;
 
     private AirtimeRepository $AirtimeRepository;
     private HistoryRepository $HistoryRepository;
@@ -49,7 +49,7 @@ class AirtimeController extends Controller
     public function createAirtime(Request $request)
     //: JsonResponse
     {
-        try{
+        try {
             date_default_timezone_set("Africa/Lagos");
 
             $uid        = Auth::user()->id;
@@ -60,7 +60,7 @@ class AirtimeController extends Controller
 
             //date('Y-m-d', strtotime(date('Y-m-d'). ' +'. $dueDate));
 
-            $requestID  = date('YmdHi').rand(99, 9999999);
+            $requestID  = date('YmdHi') . rand(99, 9999999);
             $req_Account_process    = $this->WalletRepository->getWalletBalance($uid);
             $req_bal_process        = $req_Account_process->balance;
             $req_loanBal_process    = $req_Account_process->loan_balance;
@@ -72,7 +72,7 @@ class AirtimeController extends Controller
             // Validate Account Verification
             $amount         = strip_tags($request->total_price);
             $network        = strip_tags($request->network_operator);
-            $customer_ref   = 'ZR_'.rand(99, 999999);
+            $customer_ref   = 'ZR_' . rand(99, 999999);
             $actAmt         = strip_tags($request->amount);
 
             // -------------------------------- KYC --------------------------------------------------------------------------------------
@@ -87,15 +87,13 @@ class AirtimeController extends Controller
             // ----------------------------------------------------------------------------------------------------------------------------
 
 
-            if ($actAmt < 1000)
-            {
-                if ( !is_null($checkPaymentRc) ){
+            if ($actAmt < 1000) {
+                if (!is_null($checkPaymentRc)) {
 
-                    if($user->email_verified_at !="" && $user->number_verify_at != "")
-                    {
-                        if(Hash::check($request->pin, $user->create_pin)){
+                    if ($user->email_verified_at != "" && $user->number_verify_at != "") {
+                        if (Hash::check($request->pin, $user->create_pin)) {
 
-                            if($request->top_up == 1){
+                            if ($request->top_up == 1) {
 
                                 $request->validate([
                                     'top_up'            =>  'required',
@@ -105,10 +103,10 @@ class AirtimeController extends Controller
                                     'amount'            =>  'required'
                                 ]);
                                 // Processing Nigeria Data
-                                if($request->country == 'NG'){
-                                    if($req_bal_process < $amount){
+                                if ($request->country == 'NG') {
+                                    if ($req_bal_process < $amount) {
                                         return $this->errorResponse(message: 'Insufficient fund !!!',);
-                                    }else{
+                                    } else {
 
                                         // $new_bal_process = $req_bal_process - $amount;
                                         // $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
@@ -129,106 +127,102 @@ class AirtimeController extends Controller
                                         $phoneNumber = str_replace('234', '0', strip_tags($request->phoneNumber));
 
                                         $DataDetails = [
-                                            'request_id'        => $requestID,
-                                            'serviceID'         => $network,
-                                            'phone'             => $phoneNumber,
-                                            'amount'            => $actAmt,
-
+                                            "network"           => $network,
+                                            "amount"            => $actAmt,
+                                            "mobile_number"     => "$phoneNumber",
+                                            "Ported_number"     => true,
+                                            "airtime_type"      => "VTU"
                                         ];
 
                                         // send request to get service
-                                    try {
-                                        $createNigData = json_decode( $this->AirtimeRepository->createAlhAirtime($DataDetails) ); //Log::error(['err' => $createNigData]);
-                                        // return response()->json([
-                                        //     'success'       => false,
-                                        //     'statusCode'    => 500,
-                                        //     'message'       => 'Message'
-                                        // ]);
+                                        try {
+                                            $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails)); //Log::error(['err' => $createNigData]);
+                                            // return response()->json([
+                                            //     'success'       => false,
+                                            //     'statusCode'    => 500,
+                                            //     'message'       => 'Message'
+                                            // ]);
 
-                                        if( $createNigData ){
+                                            if ($createNigData) {
 
-                                            // update the wallet if purchase is successful
-                                            $new_bal_process = $req_bal_process - $amount;
-                                            $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
-                                            $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                                // update the wallet if purchase is successful
+                                                $new_bal_process = $req_bal_process - $amount;
+                                                $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                                                $this->WalletRepository->updateWallet($uid, $walletDetails);
 
-                                            // Update Wallet History ....................................................
-                                            DataWallet::create([
-                                                'transfer_ref'  => $network .' '. $amount,
-                                                'mobile_recharge'=> 'Airtime',
-                                                'user_id'       => $uid,
-                                                'balance_bfo'   => $req_bal_process,
-                                                'balance_after' => $new_bal_process,
-                                                'amount_debt'   => $amount
-                                            ]);
-                                            // ...........................................................................
-                                            $HistoryDetails = [
-                                                'user_id'               =>  $uid,
-                                                'plan'                  =>  $createNigData->plan_name,
-                                                'purchase'              =>  'Airtime',
-                                                'country_code'          =>  $request->country,
-                                                'operator_code'         =>  $network,
-                                                'product_code'          =>  'VTU',
-                                                'transfer_ref'          =>  $createNigData->ident,
-                                                'phone_number'          =>  $createNigData->mobile_numbert,
-                                                'distribe_ref'          =>  $customer_ref,
-                                                'selling_price'         =>  $amount,
-                                                'cost_price'            =>  $actAmt,
-                                                'receive_value'         =>  $amount,
-                                                'send_value'            =>  $actAmt,
-                                                'receive_currency'      =>  'NGN',
-                                                'commission_applied'    =>  0,
-                                                'startedUtc'            =>  NOW(),
-                                                'completedUtc'          =>  $createNigData->create_date,
-                                                'processing_state'      =>  $createNigData->Status,
-                                            ];
-                                            $query = $this->HistoryRepository->createHistory($HistoryDetails);
-                                            if($query){
-                                                return $this->successResponse(message: 'You\'ve Purchase ' . $phoneNumber . ' With ' . number_format($actAmt) . ' NGN Airtime',);
-                                            }else{
-                                                return $this->errorResponse(message: 'Transaction Failed !!!',);
+                                                // Update Wallet History ....................................................
+                                                DataWallet::create([
+                                                    'transfer_ref'  => $network . ' ' . $amount,
+                                                    'mobile_recharge' => 'Airtime',
+                                                    'user_id'       => $uid,
+                                                    'balance_bfo'   => $req_bal_process,
+                                                    'balance_after' => $new_bal_process,
+                                                    'amount_debt'   => $amount
+                                                ]);
+                                                // ...........................................................................
+                                                $HistoryDetails = [
+                                                    'user_id'               =>  $uid,
+                                                    'plan'                  =>  $createNigData->plan_name,
+                                                    'purchase'              =>  'Airtime',
+                                                    'country_code'          =>  $request->country,
+                                                    'operator_code'         =>  $network,
+                                                    'product_code'          =>  'VTU',
+                                                    'transfer_ref'          =>  $createNigData->ident,
+                                                    'phone_number'          =>  $createNigData->mobile_numbert,
+                                                    'distribe_ref'          =>  $customer_ref,
+                                                    'selling_price'         =>  $amount,
+                                                    'cost_price'            =>  $actAmt,
+                                                    'receive_value'         =>  $amount,
+                                                    'send_value'            =>  $actAmt,
+                                                    'receive_currency'      =>  'NGN',
+                                                    'commission_applied'    =>  0,
+                                                    'startedUtc'            =>  NOW(),
+                                                    'completedUtc'          =>  $createNigData->create_date,
+                                                    'processing_state'      =>  $createNigData->Status,
+                                                ];
+                                                $query = $this->HistoryRepository->createHistory($HistoryDetails);
+                                                if ($query) {
+                                                    return $this->successResponse(message: 'You\'ve Purchase ' . $phoneNumber . ' With ' . number_format($actAmt) . ' NGN Airtime',);
+                                                } else {
+                                                    return $this->errorResponse(message: 'Transaction Failed !!!',);
+                                                }
+                                            } else {
+
+                                                $new_bal_process = $req_bal_process + $amount;
+                                                $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                                                $this->WalletRepository->updateWallet($uid, $walletDetails);
+
+                                                return response()->json([
+                                                    'success'       => false,
+                                                    'statusCode'    => 500,
+                                                    'Error'         => $createNigData,
+                                                    'message'       => 'An error occured, try later!!!',
+                                                ]);
                                             }
+                                        } catch (\Exception $e) {
 
-                                        } else {
-
-                                            $new_bal_process = $req_bal_process + $amount;
-                                            $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
-                                            $this->WalletRepository->updateWallet($uid, $walletDetails);
-
-                                            return response()->json([
-                                                'success'       => false,
-                                                'statusCode'    => 500,
-                                                'Error'         => $createNigData,
-                                                'message'       => $createNigData->content->transactions->status,
-                                            ]);
-                                        }
-                                    }catch (\Exception $e) {
-
-                                        // Log the exception
+                                            // Log the exception
                                             Log::error('Exception: ' . $e->getMessage());
                                             // Return an error response
                                             return $this->errorResponse(message: 'An error occurred: ' . $e->getMessage(),);
+                                        }
                                     }
-
-                                    }
-
                                 }
                                 // Processing Other Countries Data
-                                else{
+                                else {
                                     // Check wallet balance
-                                    if($req_bal_process < $amount){
+                                    if ($req_bal_process < $amount) {
                                         return $this->errorResponse(message: 'Insufficient fund !!!',);
-                                    }else{
+                                    } else {
 
                                         $new_bal_process = (float) $req_bal_process - (float)$amount;
-                                        $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                        $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
 
-                                        if($this->WalletRepository->updateWallet($uid, $walletDetails) )
-                                        {
+                                        if ($this->WalletRepository->updateWallet($uid, $walletDetails)) {
                                             // Update Wallet History ....................................................
                                             DataWallet::create([
-                                                'transfer_ref'  => $network .' '. $actAmt,
-                                                'mobile_recharge'=> 'Airtime',
+                                                'transfer_ref'  => $network . ' ' . $actAmt,
+                                                'mobile_recharge' => 'Airtime',
                                                 'user_id'       => $uid,
                                                 'balance_bfo'   => $req_bal_process,
                                                 'balance_after' => $new_bal_process,
@@ -247,7 +241,7 @@ class AirtimeController extends Controller
                                                 'RegionCode'        => $network
                                             ];
                                             $response = $this->AirtimeRepository->createIntAirtime($DataDetails);
-                                            if($response['ResultCode'] ==1){
+                                            if ($response['ResultCode'] == 1) {
                                                 $HistoryDetails = [
                                                     'user_id'               =>  $uid,
                                                     'plan'                  =>  $actAmt,
@@ -269,43 +263,41 @@ class AirtimeController extends Controller
                                                 ];
                                                 $query = $this->HistoryRepository->createHistory($HistoryDetails);
 
-                                                if($query){
+                                                if ($query) {
                                                     return $this->successResponse(message: 'Successful !!!',);
-                                                }else{
+                                                } else {
                                                     return $this->errorResponse(message: 'Transaction Failed !!!',);
                                                 }
-
-                                            }else{
+                                            } else {
                                                 $new_bal_process = $req_bal_process + $amount;
-                                                $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                                $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                                 $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                                 return $this->errorResponse(message: 'Error Occured, try later !!!',);
                                             }
-                                        }else{
+                                        } else {
                                             return $this->errorResponse(message: 'Internal Server Error, Please Retry !!!',);
                                         }
                                     }
                                     // return $response;
                                 }
-                            }elseif($request->top_up ==2){
+                            } elseif ($request->top_up == 2) {
                                 // Check User Add Card or Not ------------------------------------------------------------------------------
                                 if (!empty($CheckCard)) {
                                     // Check if loan record exist ============================================================+++
                                     $isLoan = $this->LoanHistoryRepository->getUserLoan($uid);
-                                    if ( !empty($isLoan) ) {
+                                    if (!empty($isLoan)) {
                                         return $this->errorResponse(message: 'You have an outstanding debt !!!', code: 500,);
                                     } else {
                                         // check if user complete Kyc---------------------------------------------------------------------------
-                                        if($Kyc){
-                                            if($Kyc->verificationStatus == 1)
-                                            {
-                                                if($LoanCountry){
-                                                    if($req_loanBal_process >= 100){
+                                        if ($Kyc) {
+                                            if ($Kyc->verificationStatus == 1) {
+                                                if ($LoanCountry) {
+                                                    if ($req_loanBal_process >= 100) {
                                                         return $this->errorResponse(message: 'Your Balance Is Still High, You Cannot Loan At This Time !!!',);
-                                                    }else{
+                                                    } else {
                                                         // Processing Loan Nigeria Data
-                                                        if($request->country == 'NG'){
+                                                        if ($request->country == 'NG') {
                                                             // $new_loanBal_process = $req_loanBal_process + $amount;
                                                             // $walletDetails = [ 'loan_balance' => $new_loanBal_process, 'updated_at'=> NOW() ];
                                                             // $this->WalletRepository->updateWallet($uid, $walletDetails);
@@ -313,21 +305,22 @@ class AirtimeController extends Controller
 
                                                             // dd($amount);
                                                             $DataDetails = [
-                                                                'request_id'        => $requestID,
-                                                                'serviceID'         => $network,
-                                                                'amount'            => $actAmt,
-                                                                'phone'             => $phoneNumber,
+                                                                "network"           => $network,
+                                                                "amount"            => $actAmt,
+                                                                "mobile_number"     => "$phoneNumber",
+                                                                "Ported_number"     => true,
+                                                                "airtime_type"      => "VTU"
                                                             ];
                                                             // dd($requestID);
                                                             // Store returned data in DB
-                                                        try {
-                                                            $createNigData = json_decode( $this->AirtimeRepository->createVTPassAirtime($DataDetails) );
+                                                            try {
+                                                                $createNigData = json_decode($this->AirtimeRepository->createVTPassAirtime($DataDetails));
                                                                 //  return $createNigData;
 
                                                                 if ($createNigData->code == '000') {
                                                                     //update loan amount
                                                                     $new_loanBal_process = $req_loanBal_process + $amount;
-                                                                    $walletDetails = [ 'loan_balance' => $new_loanBal_process, 'updated_at'=> NOW() ];
+                                                                    $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
                                                                     $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                                                     // Store returned data in DB
@@ -356,13 +349,12 @@ class AirtimeController extends Controller
                                                                     ];
                                                                     $query = $this->LoanHistoryRepository->createLoanHistory($HistoryDetails);
 
-                                                                    if($query){
+                                                                    if ($query) {
                                                                         return $this->successResponse(message: 'You Loan ' . $phoneNumber . ' With ' . number_format($actAmt) . ' NGN Airtime',);
-                                                                    }else{
+                                                                    } else {
                                                                         return $this->errorResponse(message: 'Transaction Failed !!!',);
                                                                     }
-
-                                                                } else if( $createNigData->code == '016' ){
+                                                                } else if ($createNigData->code == '016') {
 
                                                                     // $new_bal_process = $req_bal_process + $amount;
                                                                     // $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
@@ -375,12 +367,12 @@ class AirtimeController extends Controller
                                                                         'statusCode'    => 500,
                                                                         'Error'         => $createNigData,
                                                                         // 'message'       => 'Transaction Failed, Unknown Error Occurered, Try Later'
-                                                                        'message'       => $createNigData->content->transactions->status,
+                                                                        'message'       => 'Transaction failed, try later !!!',
                                                                     ]);
                                                                 }
-                                                        }catch (\Exception $e) {
+                                                            } catch (\Exception $e) {
 
-                                                            // Log the exception
+                                                                // Log the exception
                                                                 Log::error('Exception: ' . $e->getMessage());
 
                                                                 // Optionally, you can re-throw the exception to propagate it
@@ -388,10 +380,10 @@ class AirtimeController extends Controller
 
                                                                 // Return an error response
                                                                 return $this->errorResponse(message: 'An error occurred: ' . $e->getMessage(),);
-                                                        }
+                                                            }
                                                         }
                                                         //other countries
-                                                        else{
+                                                        else {
                                                             $DataDetails = [
                                                                 'SkuCode'           => $network,
                                                                 'SendValue'         => $actAmt,
@@ -403,14 +395,14 @@ class AirtimeController extends Controller
                                                             ];
                                                             $response = $this->AirtimeRepository->createIntAirtime($DataDetails);
                                                             // return $response;
-                                                            if($response['ResultCode'] ==1){
+                                                            if ($response['ResultCode'] == 1) {
                                                                 $HistoryDetails = [
                                                                     'user_id'               =>  $uid,
                                                                     'plan'                  =>  $actAmt,
                                                                     'purchase'              =>  'Airtime',
                                                                     'country_code'          =>  $request->country,
                                                                     'operator_code'         =>  $network,
-                                                                    'product_code'          =>  $network,//$skuCode
+                                                                    'product_code'          =>  $network, //$skuCode
                                                                     'transfer_ref'          =>  $response['TransferRecord']['TransferId']['TransferRef'],
                                                                     'phone_number'          =>  $request->phoneNumber,
                                                                     'distribe_ref'          =>  $response['TransferRecord']['TransferId']['DistributorRef'],
@@ -428,52 +420,43 @@ class AirtimeController extends Controller
                                                                     'due_date'              =>  $request->loan_term
                                                                 ];
                                                                 $query = $this->LoanHistoryRepository->createLoanHistory($HistoryDetails);
-                                                                if($query){
+                                                                if ($query) {
                                                                     return $this->successResponse(message: 'Succeeded !!!',);
-                                                                }else{
+                                                                } else {
                                                                     return $this->errorResponse(message: 'Transaction Failed !!!',);
                                                                 }
-
                                                             } else {
                                                                 return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
                                                             }
                                                         }
                                                     }
-                                                }else{
+                                                } else {
                                                     return $this->errorResponse(message: 'Sorry, loan is not available in the selected country !!!',);
                                                 }
-                                            }
-                                            else
-                                            {
+                                            } else {
                                                 return $this->errorResponse(message: 'Verification Status Is Still Pending !!!',);
                                             }
                                         } else {
-                                            return $this->errorResponse(message: 'Kindly proceed to kyc page !!!', );
+                                            return $this->errorResponse(message: 'Kindly proceed to kyc page !!!',);
                                         }
-
                                     }
                                     // =====================================================================================+++
 
                                 } else {
                                     return $this->errorResponse(message: 'Please Add Card To Continue !!!', code: 500,);
                                 }
-
-                            }else{
+                            } else {
                                 return $this->errorResponse(message: 'Invalid Selection, Please Make a Choice !!!', code: 500,);
                             }
-
-                        }else{
+                        } else {
                             return $this->errorResponse(message: 'Incorrect PIN !!!', code: 500,);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         return $this->errorResponse(message: 'Complete Account Verification !!!', code: 500,);
                     }
                     // PIN Validation
 
-                } else
-                {
+                } else {
 
                     return $this->errorResponse(message: 'No payment record found !!!', code: 500,);
                 }
