@@ -86,6 +86,12 @@ class AirtimeController extends Controller
 
             // ----------------------------------------------------------------------------------------------------------------------------
 
+            // -------------------------------- CHECK NETWORK ID --------------------------------------------------------------------------------
+            if ($network=='mtn'){$networkID =1;}
+            elseif ($network=='airtel'){$networkID =1;}
+            elseif ($network=='etisalat'){$networkID =1;}
+            elseif ($network=='glo'){$networkID =1;}
+            // -----------------------------------------------------------------------------------------------------------------------------------
 
             if ($actAmt < 1000) {
                 if (!is_null($checkPaymentRc)) {
@@ -117,7 +123,7 @@ class AirtimeController extends Controller
                                         $phoneNumber = str_replace('234', '0', strip_tags($request->phoneNumber));
 
                                         $DataDetails = [
-                                            "network"           => $network,
+                                            "network"           => $networkID,
                                             "amount"            => $actAmt,
                                             "mobile_number"     => "$phoneNumber",
                                             "Ported_number"     => true,
@@ -291,7 +297,7 @@ class AirtimeController extends Controller
 
                                                             // dd($amount);
                                                             $DataDetails = [
-                                                                "network"           => $network,
+                                                                "network"           => $networkID,
                                                                 "amount"            => $actAmt,
                                                                 "mobile_number"     => "$phoneNumber",
                                                                 "Ported_number"     => true,
