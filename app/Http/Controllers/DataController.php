@@ -172,7 +172,7 @@ class DataController extends Controller
                                     $phoneNumber = str_replace('234', '0', $request->phoneNumber);
                                     $DataDetails = [
                                         'network'       => $network, //1
-                                        'mobile_number' => $phoneNumber, //"09037346247",
+                                        'mobile_number' => "0$phoneNumber", //"09037346247",
                                         'plan'          => $skuCode,//6,
                                         'Ported_number' => true
                                     ];
@@ -354,7 +354,7 @@ class DataController extends Controller
                                                     $phoneNumber = str_replace('234', '0', $request->phoneNumber);
                                                     $DataDetails = [
                                                         'network'       => $network, //1
-                                                        'mobile_number' => $phoneNumber, //"09037346247",
+                                                        'mobile_number' => "$phoneNumber", //"09037346247",
                                                         'plan'          => $skuCode,//6,
                                                         'Ported_number' => true
                                                     ];

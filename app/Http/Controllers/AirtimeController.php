@@ -75,7 +75,7 @@ class AirtimeController extends Controller
             $network        = strip_tags($request->network_operator);
             $customer_ref   = 'ZR_' . rand(99, 999999);
             $actAmt         = strip_tags($request->amount);
-            $plan           = $network . ' Airtim VTU';
+            $plan           = strtoupper($network) . ' Airtim VTU';
 
             // -------------------------------- KYC --------------------------------------------------------------------------------------
             $Kyc = Kyc::where('user_id', $uid)->first();
