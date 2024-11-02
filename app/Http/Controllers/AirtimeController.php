@@ -103,28 +103,16 @@ class AirtimeController extends Controller
                                     'amount'            =>  'required'
                                 ]);
                                 // Processing Nigeria Data
-                                if($request->country == 'NG'){
+                                if ($request->country == 'NG') {
                                     $req_bal_process = (float) $req_bal_process;
-                                    $amount = (float) $amount; 
-                                    if($req_bal_process < $amount){
+                                    $amount = (float) $amount;
+                                    if ($req_bal_process < $amount) {
                                         return $this->errorResponse(message: 'Insufficient fund !!!',);
                                     } else {
 
                                         // $new_bal_process = $req_bal_process - $amount;
                                         // $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
                                         // $this->WalletRepository->updateWallet($uid, $walletDetails);
-
-                                        //  // Update Wallet History ....................................................
-                                        // DataWallet::create([
-                                        //     'transfer_ref'  => $network .' '. $amount,
-                                        //     'mobile_recharge'=> 'Airtime',
-                                        //     'user_id'       => $uid,
-                                        //     'balance_bfo'   => $req_bal_process,
-                                        //     'balance_after' => $new_bal_process,
-                                        //     'amount_debt'   => $amount
-                                        // ]);
-                                        // // ...........................................................................
-
 
                                         $phoneNumber = str_replace('234', '0', strip_tags($request->phoneNumber));
 
@@ -139,11 +127,6 @@ class AirtimeController extends Controller
                                         // send request to get service
                                         try {
                                             $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails)); //Log::error(['err' => $createNigData]);
-                                            // return response()->json([
-                                            //     'success'       => false,
-                                            //     'statusCode'    => 500,
-                                            //     'message'       => 'Message'
-                                            // ]);
 
                                             if ($createNigData) {
 
@@ -164,7 +147,7 @@ class AirtimeController extends Controller
                                                 // ...........................................................................
                                                 $HistoryDetails = [
                                                     'user_id'               =>  $uid,
-                                                    'plan'                  =>  $createNigData->plan_name,
+                                                    'plan'                  =>  $createNigData->plan_amount,
                                                     'purchase'              =>  'Airtime',
                                                     'country_code'          =>  $request->country,
                                                     'operator_code'         =>  $network,
@@ -316,7 +299,7 @@ class AirtimeController extends Controller
                                                             // dd($requestID);
                                                             // Store returned data in DB
                                                             try {
-                                                                $createNigData = json_decode($this->AirtimeRepository->createVTPassAirtime($DataDetails));
+                                                                $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails));
                                                                 //  return $createNigData;
 
                                                                 if ($createNigData->code == '000') {
@@ -328,26 +311,23 @@ class AirtimeController extends Controller
                                                                     // Store returned data in DB
                                                                     $HistoryDetails = [
                                                                         'user_id'               =>  $uid,
-                                                                        'plan'                  =>  $createNigData->content->transactions->product_name,
+                                                                        'plan'                  =>  $createNigData->plan_amount,
                                                                         'purchase'              =>  'Airtime',
                                                                         'country_code'          =>  $request->country,
                                                                         'operator_code'         =>  $network,
                                                                         'product_code'          =>  'VTU',
-                                                                        'transfer_ref'          =>  $createNigData->content->transactions->transactionId,
-                                                                        'phone_number'          =>  $createNigData->content->transactions->unique_element,
-                                                                        'distribe_ref'          =>  $createNigData->requestId,
+                                                                        'transfer_ref'          =>  $createNigData->ident,
+                                                                        'phone_number'          =>  $createNigData->mobile_numbert,
+                                                                        'distribe_ref'          =>  $customer_ref,
                                                                         'selling_price'         =>  $amount,
-                                                                        'receive_value'         =>  $createNigData->amount,
+                                                                        'cost_price'            =>  $actAmt,
+                                                                        'receive_value'         =>  $amount,
                                                                         'send_value'            =>  $actAmt,
                                                                         'receive_currency'      =>  'NGN',
-                                                                        'commission_applied'    =>  $createNigData->content->transactions->commission,
+                                                                        'commission_applied'    =>  0,
                                                                         'startedUtc'            =>  NOW(),
-                                                                        'completedUtc'          =>  NOW(),
-                                                                        'processing_state'      =>  $createNigData->content->transactions->status,
-                                                                        'loan_amount'           =>  $amount,
-                                                                        'repayment'             =>  $repayment,
-                                                                        'payment_status'        =>  'pending',
-                                                                        'due_date'              =>  $request->loan_term
+                                                                        'completedUtc'          =>  $createNigData->create_date,
+                                                                        'processing_state'      =>  $createNigData->Status,
                                                                     ];
                                                                     $query = $this->LoanHistoryRepository->createLoanHistory($HistoryDetails);
 
@@ -368,7 +348,6 @@ class AirtimeController extends Controller
                                                                         'success'       => false,
                                                                         'statusCode'    => 500,
                                                                         'Error'         => $createNigData,
-                                                                        // 'message'       => 'Transaction Failed, Unknown Error Occurered, Try Later'
                                                                         'message'       => 'Transaction failed, try later !!!',
                                                                     ]);
                                                                 }
@@ -376,10 +355,6 @@ class AirtimeController extends Controller
 
                                                                 // Log the exception
                                                                 Log::error('Exception: ' . $e->getMessage());
-
-                                                                // Optionally, you can re-throw the exception to propagate it
-                                                                // throw $e;
-
                                                                 // Return an error response
                                                                 return $this->errorResponse(message: 'An error occurred: ' . $e->getMessage(),);
                                                             }
