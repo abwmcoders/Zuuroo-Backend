@@ -126,7 +126,8 @@ class AirtimeController extends Controller
 
                                         // send request to get service
                                         try {
-                                            $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails)); //Log::error(['err' => $createNigData]);
+                                            $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails));
+                                            Log::error(['err' => $createNigData]);
 
                                             if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
 
