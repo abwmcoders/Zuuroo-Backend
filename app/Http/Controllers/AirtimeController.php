@@ -147,7 +147,7 @@ class AirtimeController extends Controller
                                                 // ...........................................................................
                                                 $HistoryDetails = [
                                                     'user_id'               =>  $uid,
-                                                    'plan'                  =>  $createNigData->plan_amount,
+                                                    'plan'                  =>  $createNigData->paid_amount,
                                                     'purchase'              =>  'Airtime',
                                                     'country_code'          =>  $request->country,
                                                     'operator_code'         =>  $network,
@@ -311,7 +311,7 @@ class AirtimeController extends Controller
                                                                     // Store returned data in DB
                                                                     $HistoryDetails = [
                                                                         'user_id'               =>  $uid,
-                                                                        'plan'                  =>  $createNigData->plan_amount,
+                                                                        'plan'                  =>  $createNigData->paid_amount,
                                                                         'purchase'              =>  'Airtime',
                                                                         'country_code'          =>  $request->country,
                                                                         'operator_code'         =>  $network,
