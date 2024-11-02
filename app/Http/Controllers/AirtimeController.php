@@ -128,7 +128,7 @@ class AirtimeController extends Controller
                                         try {
                                             $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails)); //Log::error(['err' => $createNigData]);
 
-                                            if ($createNigData) {
+                                            if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
 
                                                 // update the wallet if purchase is successful
                                                 $new_bal_process = $req_bal_process - $amount;
@@ -302,11 +302,11 @@ class AirtimeController extends Controller
                                                                 $createNigData = json_decode($this->AirtimeRepository->createAlhAirtime($DataDetails));
                                                                 //  return $createNigData;
 
-                                                                if ($createNigData->code == '000') {
+                                                                if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
                                                                     //update loan amount
-                                                                    $new_loanBal_process = $req_loanBal_process + $amount;
-                                                                    $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
-                                                                    $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                                                    // $new_loanBal_process = $req_loanBal_process + $amount;
+                                                                    // $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
+                                                                    // $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                                                     // Store returned data in DB
                                                                     $HistoryDetails = [
@@ -336,13 +336,6 @@ class AirtimeController extends Controller
                                                                     } else {
                                                                         return $this->errorResponse(message: 'Transaction Failed !!!',);
                                                                     }
-                                                                } else if ($createNigData->code == '016') {
-
-                                                                    // $new_bal_process = $req_bal_process + $amount;
-                                                                    // $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
-                                                                    // $this->WalletRepository->updateWallet($uid, $walletDetails);
-
-                                                                    return $this->errorResponse(message: 'Transaction Failed, Please Try Later !!!',);
                                                                 } else {
                                                                     return response()->json([
                                                                         'success'       => false,
