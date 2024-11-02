@@ -43,7 +43,7 @@ class BillPaymentRepository
                 'data' => $e->getMessage(),
             ];
         }
-    
+
     }
 
     public function verifyIUCNumber(array $billDetails)
@@ -81,7 +81,7 @@ class BillPaymentRepository
                 'data' => $e->getMessage(),
             ];
         }
-    
+
     }
 
     public function getCablePlan($cableId)
@@ -107,71 +107,20 @@ class BillPaymentRepository
 
     public function payElectricity(array $paymentDetails)
     {
-        $url = 'https://alrahuzdata.com.ng/api/billpayment/';
-        $headers = [
+        $response = Http::withHeaders([
             'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
-            'Content-Type'  => 'application/json',
-        ];
-
-        try {
-            $response = Http::withHeaders($headers)
-                ->post($url, $paymentDetails);
-            if ($response->successful()) {
-                return [
-                    'status' => true,
-                    'message' => 'Payment successful',
-                    'data' => $response->json(),
-                ];
-            }
-
-            return [
-                'status' => false,
-                'message' => 'Payment failed',
-                'data' => $this->formatErrorResponse($response->body())
-                ,
-            ];
-
-        }
-        catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => 'An error occurred while processing the payment',
-                'data' => $e->getMessage(),
-            ];
-        }
+            'Content-Type' => 'application/json'
+        ])->post('https://alrahuzdata.com.ng/api/billpayment/', $paymentDetails);
+        return $response;
     }
 
     public function payCableTV(array $paymentDetails)
     {
-        $url = 'https://alrahuzdata.com.ng/api/cablesub/';
-        $headers = [
+        $response = Http::withHeaders([
             'Authorization' => 'Token 8f68d6c81f1dcb34f6e8ddbeb33bde8044359182',
-            'Content-Type'  => 'application/json',
-        ];
-
-        try {
-            $response = Http::withHeaders($headers)
-                ->post($url, $paymentDetails);
-            if ($response->successful()) {
-                return [
-                    'status' => true,
-                    'message' => 'Payment successful',
-                    'data' => $response->json(),
-                ];
-            }
-
-            return [
-                'status' => false,
-                'message' => 'Payment failed',
-                'data' => $this->formatErrorResponse($response->body()),
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => 'An error occurred while processing the payment',
-                'data' => $e->getMessage(),
-            ];
-        }
+            'Content-Type' => 'application/json'
+        ])->post('https://alrahuzdata.com.ng/api/cablesub/', $paymentDetails);
+        return $response;
     }
 
     public function formatErrorResponse($jsonString)

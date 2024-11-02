@@ -66,7 +66,7 @@ class AirtimeController extends Controller
             $req_loanBal_process    = $req_Account_process->loan_balance;
             $user                   = $this->UserRepository->getUserById($uid);
             $LoanCountry            = Country::where('is_loan', true)->where('country_code', $request->country)->get();
-            
+
 
             // GLNG | MTNG | ZANG | ETNG
 
@@ -313,12 +313,12 @@ class AirtimeController extends Controller
 
                                                                 if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
                                                                     //update loan amount
-                                                                    // $new_loanBal_process = $req_loanBal_process + $amount;
-                                                                    // $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
-                                                                    // $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                                                    $new_loanBal_process = $req_loanBal_process + $amount;
+                                                                    $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
+                                                                    $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                                                     // Store returned data in DB
-                                                                    
+
                                                                     $HistoryDetails = [
                                                                         'user_id'               =>  $uid,
                                                                         'plan'                  =>  $plan,
