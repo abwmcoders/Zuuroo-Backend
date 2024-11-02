@@ -125,7 +125,7 @@ class AirtimeController extends Controller
                                         $DataDetails = [
                                             "network"           => $networkID,
                                             "amount"            => $actAmt,
-                                            "mobile_number"     => "$phoneNumber",
+                                            "mobile_number"     => "0$phoneNumber",
                                             "Ported_number"     => true,
                                             "airtime_type"      => "VTU"
                                         ];
@@ -299,7 +299,7 @@ class AirtimeController extends Controller
                                                             $DataDetails = [
                                                                 "network"           => $networkID,
                                                                 "amount"            => $actAmt,
-                                                                "mobile_number"     => "$phoneNumber",
+                                                                "mobile_number"     => "0$phoneNumber",
                                                                 "Ported_number"     => true,
                                                                 "airtime_type"      => "VTU"
                                                             ];
