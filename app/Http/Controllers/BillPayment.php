@@ -433,8 +433,8 @@ class BillPayment extends Controller
 
                             $billDetails = [
                                 'cablename'         => $cableName,
-                                'smart_card_number' => $cableNumber,
                                 'cableplan'         => $cablePlan,
+                                'smart_card_number' => $cableNumber,
                             ];
 
                             $response = json_decode($this->BillPaymentRepository->payCableTV($billDetails));

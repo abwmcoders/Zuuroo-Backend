@@ -34,27 +34,8 @@ class PaymentController extends Controller
 
         $response = $this->paystackRepository->processPayment($paymentDetails);
 
-        $authorization = $response['data']['authorization'];
-
-
         if ($response['status'] === true) {
             $paymentUrl = $response['data']['authorization_url'];
-            UserCardDetail::create([
-                'user_id' => Auth::id(),
-                'account_name' => $authorization['account_name'] ?? null,
-                'authorization_code' => $authorization['authorization_code'] ?? null,
-                'bank' => $authorization['bank'] ?? null,
-                'bin' => $authorization['bin'] ?? null,
-                'brand' => $authorization['brand'] ?? null,
-                'card_type' => $authorization['card_type'] ?? null,
-                'country_code' => $authorization['country_code'] ?? null,
-                'exp_month' => $authorization['exp_month'] ?? null,
-                'exp_year' => $authorization['exp_year'] ?? null,
-                'last4' => $authorization['last4'] ?? null,
-                'reusable' => $authorization['reusable'] ?? false,
-                'signature' => $authorization['signature'] ?? null,
-            ]);
-
             return response()->json([
                 'status' => 'success',
                 'message' => 'Payment initialized successfully',
