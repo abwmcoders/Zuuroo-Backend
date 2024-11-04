@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use App\Repositories\LoanHistoryRepository;
 use App\Repositories\HistoryRepository;
 use App\Repositories\WalletRepository;
