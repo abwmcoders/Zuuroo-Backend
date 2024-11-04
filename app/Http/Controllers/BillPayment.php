@@ -484,7 +484,8 @@ class BillPayment extends Controller
                                 // Failed Transaction Auto Refund User Wallet
                                 $new_bal_process = $req_bal_process + $request->amount;
                                 $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
-
+                                $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                Log::error(['err' => $response, "Details" => $billDetails]);
                                 return response()->json([
                                     'success'       => false,
                                     'statusCode'    => 500,
@@ -528,7 +529,7 @@ class BillPayment extends Controller
                                                     ];
                                                     $response = json_decode($this->BillPaymentRepository->payCableTV($billDetails));
                                                     // return $response;
-                                                    Log::error(['err' => $response, "Details" => $billDetails]);
+                                                    Log::error(['success' => $response, "Details" => $billDetails]);
                                                     if (isset($response->Status) && $response->Status == 'successful') {
 
                                                         $HistoryDetails = [
@@ -572,7 +573,7 @@ class BillPayment extends Controller
                                                         $new_bal_process = $req_bal_process + $request->amount;
                                                         $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                                         $this->WalletRepository->updateWallet($uid, $walletDetails);
-
+                                                        Log::error(['err' => $response, "Details" => $billDetails]);
                                                         // Alert::error('Oops', 'Internal Server Error');
                                                         // return back();
 
