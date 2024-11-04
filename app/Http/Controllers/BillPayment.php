@@ -380,10 +380,10 @@ class BillPayment extends Controller
     {
         // try{
         $Validator = Validator::make($request->all(), [
-            'top_up'                =>  'required',
-            'cableName'             => 'required|string',
-            'cablePlan'             => 'required|string',
-            'cableNumber'           => 'required|numeric',
+            'top_up'                => 'required',
+            'cableName'             => 'required',
+            'cablePlan'             => 'required',
+            'cableNumber'           => 'required',
             'customerName'          => 'required|string',
             'customerPhoneNumber'   => 'required|numeric'
         ]);
@@ -445,11 +445,11 @@ class BillPayment extends Controller
                                     'purchase'              => "cable",
                                     'country_code'          => "NG",
                                     'operator_code'         => $request->billerName,
-                                    'product_code'          => $request->amount,
+                                    'product_code'          => $request->cablePlan,
                                     'transfer_ref'          => $requestID,
                                     'phone_number'          => $request->customerPhoneNumber,
                                     'distribe_ref'          => $response->ident,
-                                    'selling_price'         => $request->amount,
+                                    'selling_price'         => $response->paid_amount,
                                     'description'           => 'Delivered',
                                     'deviceNo'              => $request->meterNumber,
                                     'commission_applied'    => 0,
@@ -528,23 +528,23 @@ class BillPayment extends Controller
 
                                                         $HistoryDetails = [
                                                             'user_id'               => $request->userID,
-                                                            'purchase'              => 'cable',
-                                                            'country_code'          =>  "NG",
+                                                            'purchase'              => "cable",
+                                                            'country_code'          => "NG",
                                                             'operator_code'         => $request->billerName,
-                                                            'product_code'          => $request->amount,
+                                                            'product_code'          => $request->cablePlan,
                                                             'transfer_ref'          => $requestID,
                                                             'phone_number'          => $request->customerPhoneNumber,
                                                             'distribe_ref'          => $response->ident,
-                                                            'selling_price'         => $request->amount,
+                                                            'selling_price'         => $response->paid_amount,
                                                             'description'           => 'Delivered',
                                                             'deviceNo'              => $request->meterNumber,
                                                             'commission_applied'    => 0,
                                                             'send_value'            => $request->amount,
                                                             'receive_value'         => $request->amount,
                                                             'cost_price'            => $response->paid_amount,
-                                                            'startedUtc'            =>  NOW(),
-                                                            'completedUtc'          =>  $response->create_date,
-                                                            'processing_state'      =>  $response->Status,
+                                                            'startedUtc'            => NOW(),
+                                                            'completedUtc'          => $response->create_date,
+                                                            'processing_state'      => $response->Status,
                                                         ];
                                                         $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
                                                         if ($createHistory) {
