@@ -387,6 +387,9 @@ class BillPayment extends Controller
             'customerName'          => 'required|string',
             'customerPhoneNumber'   => 'required|numeric'
         ]);
+        $cableName      = (int)$request->cableName;
+        $cableNumber    = (int)$request->cableNumber;
+        $cablePlan      = (int)$request->cablePlan;
 
         if ($Validator->passes()) {
 
@@ -429,9 +432,9 @@ class BillPayment extends Controller
                             $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                             $billDetails = [
-                                'cablename'         => $request->cableName,
-                                'smart_card_number' => $request->cableNumber,
-                                'cableplan'         => $request->cablePlan,
+                                'cablename'         => $cableName,
+                                'smart_card_number' => $cableNumber,
+                                'cableplan'         => $cablePlan,
                             ];
 
                             $response = json_decode($this->BillPaymentRepository->payCableTV($billDetails));
@@ -519,9 +522,9 @@ class BillPayment extends Controller
                                                     $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                                     $billDetails = [
-                                                        'cablename'         => $request->cableName,
-                                                        'smart_card_number' => $request->cableNumber,
-                                                        'cableplan'         => $request->cablePlan,
+                                                        'cablename'         => $cableName,
+                                                        'smart_card_number' => $cableNumber,
+                                                        'cableplan'         => $cablePlan,
                                                     ];
                                                     $response = json_decode($this->BillPaymentRepository->payCableTV($billDetails));
                                                     // return $response;
