@@ -36,12 +36,13 @@ class DataController extends Controller
     private $UserRepository;
     private $WalletRepository;
 
-    public function __construct(DataRepository $DataRepository,
-                                HistoryRepository $HistoryRepository,
-                                LoanHistoryRepository $LoanHistoryRepository,
-                                UserRepository $UserRepository,
-                                WalletRepository $WalletRepository)
-    {
+    public function __construct(
+        DataRepository $DataRepository,
+        HistoryRepository $HistoryRepository,
+        LoanHistoryRepository $LoanHistoryRepository,
+        UserRepository $UserRepository,
+        WalletRepository $WalletRepository
+    ) {
         $this->DataRepository = $DataRepository;
         $this->HistoryRepository = $HistoryRepository;
         $this->LoanHistoryRepository = $LoanHistoryRepository;
@@ -52,7 +53,7 @@ class DataController extends Controller
 
     public function createData(Request $request)
     {
-        try{
+        try {
             // -----------------------VARIABLE RE_DELARATION ------------------------------------------------------------------------
             $uid = Auth::user()->id;
             $uemail = Auth::user()->email;
@@ -60,34 +61,39 @@ class DataController extends Controller
             $uname = Auth::user()->name;
             $Username = Auth::user()->username;
             $uphone = Auth::user()->mobile;
-            $UserPlan = $Username.' weekly loan';
+            $UserPlan = $Username . ' weekly loan';
             $LoanAmount = $request->repayment;
             $originalDate = date('Y-m-d'); // Your original date
             $daysToAdd = $request->loan_term; // Number of days to add
             $newDate = date("Y-m-d", strtotime("+" . $daysToAdd . " days"));
             // GLNG | MTNG | ZANG | ETNG
             $network = "";
-            $customer_ref = 'ZR_'.rand(99, 999999);
+            $customer_ref = 'ZR_' . rand(99, 999999);
             $destributor_ref = 'TRN' . strtoupper(uniqid()); //$request->DistributorRef
 
             // ---------------------------------NETWORK MANAGEMENT ------------------------------------------------------------------
-            if($request->network_operator == 'mtn'){ $network = 1;}
-            elseif($request->network_operator == 'airtel'){ $network = 4;}
-            elseif($request->network_operator == 'glo'){ $network = 2;}
-            elseif($request->network_operator == 'etisalat'){ $network = 3;}
-            else{ $network = $request->network_operator; }
+            if ($request->network_operator == 'mtn') {
+                $network = 1;
+            } elseif ($request->network_operator == 'airtel') {
+                $network = 4;
+            } elseif ($request->network_operator == 'glo') {
+                $network = 2;
+            } elseif ($request->network_operator == 'etisalat') {
+                $network = 3;
+            } else {
+                $network = $request->network_operator;
+            }
             // ------------------------------------------------------------------------------------------------------------------------
 
             // -----------------------------------GET PROUCT DETAILS ------------------------------------------------------------------
-            if($request->country == 'NG'){
+            if ($request->country == 'NG') {
                 $prdD           = Product::where('product_code', $request->data_plan)->first();
                 $skuCode        = $prdD->product_code;
                 $product_price  = $prdD->product_price;
                 $sendValue      = $prdD->send_value;
                 $product_name   = $prdD->product_name;
                 $cost_price     = $prdD->cost_price;
-            }
-            else{
+            } else {
                 // return $request->data_plan;
                 $arrayData      = explode(",", $request->data_plan);
                 $skuCode        = $arrayData[0];
@@ -126,14 +132,12 @@ class DataController extends Controller
 
             // Check if user complete email verification ----------------------------------------------------------------------------------
 
-            if ( !is_null($checkPaymentRc) )
-            {
+            if (!is_null($checkPaymentRc)) {
                 if (Hash::check($request->pin, $user->create_pin)) {
-                    if($user->email_verified_at !="" && $user->number_verify_at != "")
-                    {
+                    if ($user->email_verified_at != "" && $user->number_verify_at != "") {
                         // Check what user want to purchase loan/topup -------------------------------------------------------------------------
                         // Topup Service -------------------------------------------------------------------------------------------------------
-                        if($request->top_up == 1){
+                        if ($request->top_up == 1) {
                             $request->validate([
                                 'top_up'            =>  'required',
                                 'country'           =>  'required',
@@ -144,24 +148,23 @@ class DataController extends Controller
 
                             // $network
                             // Processing Nigeria Data
-                            if($request->country == 'NG'){
+                            if ($request->country == 'NG') {
 
-                                if($req_bal_process < $product_price){
+                                if ($req_bal_process < $product_price) {
 
                                     return $this->errorResponse(message: 'Insufficient fund !!!',);
-
-                                }else{
+                                } else {
 
                                     // Update Wallet Balance ---------------------------------------------------
                                     $new_bal_process = $req_bal_process - $product_price;
-                                    $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                    $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                     $this->WalletRepository->updateWallet($uid, $walletDetails);
                                     // -------------------------------------------------------------------------
 
                                     // Update Wallet History ....................................................
                                     DataWallet::create([
                                         'transfer_ref'  => $product_name,
-                                        'mobile_recharge'=> 'Data',
+                                        'mobile_recharge' => 'Data',
                                         'user_id'       => $uid,
                                         'balance_bfo'   => $req_bal_process,
                                         'balance_after' => $new_bal_process,
@@ -173,25 +176,25 @@ class DataController extends Controller
                                     $DataDetails = [
                                         'network'       => $network, //1
                                         'mobile_number' => "0$phoneNumber", //"09037346247",
-                                        'plan'          => $skuCode,//6,
+                                        'plan'          => $skuCode, //6,
                                         'Ported_number' => true
                                     ];
 
-                                    $createNigData = json_decode( $this->DataRepository->createNgData($DataDetails) );
+                                    $createNigData = json_decode($this->DataRepository->createNgData($DataDetails));
                                     // return $createNigData;
 
-                                    if( !$createNigData ){
+                                    if (!$createNigData) {
 
                                         // If error occur from APi --------------------------------------------------
                                         $new_bal_process = $req_bal_process + $product_price;
-                                        $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                        $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                         $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                         return $this->errorResponse(message: 'Internal Server Error, Please Try Later !!!',);
 
                                         // --------------------------------------------------------------------------
 
-                                    }else{
+                                    } else {
                                         // return $createNigData;
                                         // Store returned data in DB ---------------------------------------------------
                                         $HistoryDetails = [
@@ -217,43 +220,38 @@ class DataController extends Controller
                                         $query = $this->HistoryRepository->createHistory($HistoryDetails);
                                         // ------------------------------------------------------------------------------
 
-                                        if($query){
-
+                                        if ($query) {
+                                            Log::error(['success' => 'Data successful']);
                                             return $this->successResponse(message: 'Your recharge of ' . $createNigData->plan_name . ' has been sent to ' . $createNigData->mobile_number,);
-
-                                        }else{
-
+                                        } else {
+                                            Log::error(['err' => 'Data purchase failed']);
                                             return $this->errorResponse(message: 'Transaction Failed !!!',);
-
                                         }
                                     }
-
                                 }
                             }
 
 
                             // Processing Other Countries Data
-                            else{
+                            else {
 
                                 // Check wallet balance ------------------------------------------------------------
-                                if($req_bal_process < $product_price){
+                                if ($req_bal_process < $product_price) {
 
                                     return $this->errorResponse(message: 'Insufficient fund !!!',);
-
-                                }else{
+                                } else {
 
                                     $new_bal_process = $req_bal_process - $product_price;
-                                    $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                    $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                     $wallet_update = $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                     // return $new_bal_process;
-                                    if($wallet_update)
-                                    {
+                                    if ($wallet_update) {
 
                                         // Update Wallet History ....................................................
                                         DataWallet::create([
                                             'transfer_ref'  => $data_plan,
-                                            'mobile_recharge'=> 'Data',
+                                            'mobile_recharge' => 'Data',
                                             'user_id'       => $uid,
                                             'balance_bfo'   => $req_bal_process,
                                             'balance_after' => $new_bal_process,
@@ -272,9 +270,9 @@ class DataController extends Controller
                                             'RegionCode'        => $network
                                         ];
                                         // return $data_plan;
-                                        $response = json_decode( $this->DataRepository->createIntData($DataDetails) );
+                                        $response = json_decode($this->DataRepository->createIntData($DataDetails));
 
-                                        if( isset($response->ResultCode) && $response->ResultCode ==1 ){
+                                        if (isset($response->ResultCode) && $response->ResultCode == 1) {
                                             // return $request->data_plan;
                                             $HistoryDetails = [
                                                 'user_id'               =>  $uid,
@@ -297,36 +295,30 @@ class DataController extends Controller
                                                 'processing_state'      =>  $response->TransferRecord->ProcessingState,
                                             ];
                                             $query = $this->HistoryRepository->createHistory($HistoryDetails);
-                                            if($query){
+                                            if ($query) {
                                                 // use Alert;
-                                                return $this->successResponse(message:'You\'ve Purchase ' . $request->phoneNumber . ' With ' . $product_name,);
-
-                                            }else{
+                                                return $this->successResponse(message: 'You\'ve Purchase ' . $request->phoneNumber . ' With ' . $product_name,);
+                                            } else {
 
                                                 return $this->errorResponse(message: 'Transaction Failed !!!',);
-
                                             }
-
-                                        }else{
+                                        } else {
 
                                             $new_bal_process = $req_bal_process + $product_price;
-                                            $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
+                                            $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                             $this->WalletRepository->updateWallet($uid, $walletDetails);
 
                                             return $this->errorResponse(message: 'Request Could Not Be Completed !!!', code: 400,);
-
                                         }
-                                    }else{
+                                    } else {
 
                                         return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
-
                                     }
-
                                 }
                             }
                         }
                         // Loan Service --------------------------------------------------------------------------------------------------------
-                        elseif($request->top_up == 2){
+                        elseif ($request->top_up == 2) {
                             $request->validate([
                                 'top_up'            =>  'required',
                                 'country'           =>  'required',
@@ -340,22 +332,21 @@ class DataController extends Controller
                             // Check User Add Card or Not ------------------------------------------------------------------------------
                             if (!empty($CheckCard)) {
                                 // check if user complete Kyc---------------------------------------------------------------------------
-                                if($Kyc){
-                                    if($Kyc->verificationStatus == 1)
-                                    {
+                                if ($Kyc) {
+                                    if ($Kyc->verificationStatus == 1) {
                                         // Check if user already exist in loan table ---------------------------------------------------
                                         $isLoan = $this->LoanHistoryRepository->getUserLoan($uid);
                                         // --------------------------------------------------------------------------------------------
-                                        if ( empty($isLoan) ) {
-                                            if($req_bal_process >= 40){
+                                        if (empty($isLoan)) {
+                                            if ($req_bal_process >= 40) {
                                                 return $this->errorResponse(message: 'Your Balance Is Still High, You Cannot Loan At This Time !!!',);
-                                            }else{
-                                                if($request->country == 'NG'){
+                                            } else {
+                                                if ($request->country == 'NG') {
                                                     $phoneNumber = str_replace('234', '0', $request->phoneNumber);
                                                     $DataDetails = [
                                                         'network'       => $network, //1
                                                         'mobile_number' => "$phoneNumber", //"09037346247",
-                                                        'plan'          => $skuCode,//6,
+                                                        'plan'          => $skuCode, //6,
                                                         'Ported_number' => true
                                                     ];
 
@@ -368,11 +359,11 @@ class DataController extends Controller
                                                     //             'loanAmount'    => $LoanAmount
                                                     //         ]);
 
-                                                    if( $createNigData && isset($createNigData->plan_name) ){
+                                                    if ($createNigData && isset($createNigData->plan_name)) {
 
                                                         // Update wallet balance -----------------------------------------------------------------
                                                         $new_loanBal_process = $req_loanBal_process + $LoanAmount;
-                                                        $walletDetails = [ 'loan_balance' => $new_loanBal_process, 'updated_at'=> NOW() ];
+                                                        $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
                                                         $this->WalletRepository->updateWallet($uid, $walletDetails);
                                                         // ----------------------------------------------------------------------------------------
 
@@ -405,32 +396,29 @@ class DataController extends Controller
                                                         $query = $this->LoanHistoryRepository->createLoanHistory($HistoryDetails);
                                                         // -------------------------------------------------------------------------------------
 
-                                                        if($query){
+                                                        if ($query) {
 
                                                             return response()->json([
                                                                 'success'       => true,
                                                                 'statusCode'    => 200,
                                                                 'loanAmount'    => $LoanAmount,
-                                                                'message'       => 'Your loan of '. $createNigData->plan_name . ' has been sent to '. $createNigData->mobile_number
+                                                                'message'       => 'Your loan of ' . $createNigData->plan_name . ' has been sent to ' . $createNigData->mobile_number
                                                             ]);
-
-                                                        }else{
+                                                        } else {
                                                             return $this->errorResponse(message: 'Loan Request Failed !!!',);
                                                         }
-
-                                                    }else{
+                                                    } else {
 
                                                         return response()->json([
                                                             'success'       => false,
                                                             'statusCode'    => 500,
                                                             'message'       => 'Your request could not be completed, try later !!!'
                                                         ]);
-
                                                     }
-                                                }else{
+                                                } else {
                                                     $DataDetails = [
                                                         'SkuCode'           => $skuCode,
-                                                        'SendValue'         => $product_price ,
+                                                        'SendValue'         => $product_price,
                                                         'SendCurrencyIso'   => 'USD',
                                                         'AccountNumber'     => $request->phoneNumber,
                                                         'DistributorRef'    => $destributor_ref,
@@ -438,20 +426,20 @@ class DataController extends Controller
                                                         'RegionCode'        => $network
                                                     ];
 
-                                                    $response = json_decode( $this->DataRepository->createIntData($DataDetails) );
+                                                    $response = json_decode($this->DataRepository->createIntData($DataDetails));
 
 
-                                                    if( isset($response->ResultCode) && $response->ResultCode ==1 ){
+                                                    if (isset($response->ResultCode) && $response->ResultCode == 1) {
 
                                                         // Update wallet balance -----------------------------------------------------------------
                                                         $new_loanBal_process = $req_loanBal_process + $LoanAmount;
-                                                        $walletDetails = [ 'loan_balance' => $new_loanBal_process, 'updated_at'=> NOW() ];
+                                                        $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
                                                         $this->WalletRepository->updateWallet($uid, $walletDetails);
                                                         // ----------------------------------------------------------------------------------------
 
                                                         $HistoryDetails = [
                                                             'user_id'               =>  $uid,
-                                                            'plan'                  =>  $data_plan,//$response->TransferRecord->ReceiptText,
+                                                            'plan'                  =>  $data_plan, //$response->TransferRecord->ReceiptText,
                                                             'purchase'              =>  'Data',
                                                             'country_code'          =>  $request->country,
                                                             'operator_code'         =>  $network,
@@ -474,26 +462,22 @@ class DataController extends Controller
                                                             'due_date'              =>  $daysToAdd . " days",
                                                         ];
                                                         $query = $this->LoanHistoryRepository->createLoanHistory($HistoryDetails);
-                                                        if($query){
+                                                        if ($query) {
                                                             return $this->successResponse(message: 'You\'ve Loan ' . $request->phoneNumber . ' With ' . $response['TransferRecord']['ReceiptText'],);
-                                                        }else{
-                                                            return $this->errorResponse(message:'Loan Request Failed !!!',);
+                                                        } else {
+                                                            return $this->errorResponse(message: 'Loan Request Failed !!!',);
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
-                                        else{
+                                        } else {
                                             return $this->errorResponse(message: 'You have an outstanding debt !!!',);
                                         }
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         return $this->errorResponse(message: 'Verification Status Is Still Pending !!!',);
                                     }
-                                }
-                                else {
-                                    return $this->errorResponse(message: 'Kindly proceed to kyc page !!!', );
+                                } else {
+                                    return $this->errorResponse(message: 'Kindly proceed to kyc page !!!',);
                                 }
                             } else {
                                 return $this->errorResponse(message: 'Please Add Card To Continue !!!',);
@@ -501,16 +485,13 @@ class DataController extends Controller
                         }
 
                         // When not loan nor topup ---------------------------------------------------------------------------------------------
-                        else{
+                        else {
                             return $this->errorResponse(message: 'Invalid Selection, Please Make a Choice !!!',);
                         }
-                    }
-                    else{
+                    } else {
                         return $this->errorResponse(message: 'Complete Account Verification !!!',);
                     }
-                }
-                else
-                {
+                } else {
                     return $this->errorResponse(message: 'Incorrect PIN !!!',);
                 }
             } else {
@@ -519,9 +500,5 @@ class DataController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
         }
-
     }
-
-
-
 }
