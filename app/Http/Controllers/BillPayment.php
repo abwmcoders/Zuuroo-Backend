@@ -435,7 +435,8 @@ class BillPayment extends Controller
                             ];
 
                             $response = json_decode($this->BillPaymentRepository->payCableTV($billDetails));
-                            return response()->json($response);
+                            Log::error(['err' => $response, "Details" => $billDetails]);
+                            // return response()->json($response);
 
                             //! TODO:
                             if (isset($response->Status) && $response->Status == 'successful') {
