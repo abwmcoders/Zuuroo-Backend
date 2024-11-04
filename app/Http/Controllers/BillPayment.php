@@ -171,11 +171,11 @@ class BillPayment extends Controller
         $Validator = Validator::make($request->all(), [
             'top_up'                => 'required',
             'billerName'            => 'required|string',
-            'meterType'             => 'required|numeric',
-            'meterNumber'           => 'required|string',
-            'amount'                => 'required|string',
+            'meterType'             => 'required|string',
+            'meterNumber'           => 'required|numeric',
+            'amount'                => 'required|numeric',
             // 'customerName'          => 'required',
-            'customerPhoneNumber'   => 'required|string'
+            'customerPhoneNumber'   => 'required|numeric'
         ]);
 
         if ($Validator->passes()) {
@@ -380,12 +380,12 @@ class BillPayment extends Controller
     {
         // try{
         $Validator = Validator::make($request->all(), [
-            'top_up'                =>  'required',
-            'cableName'             => 'required|string',
-            'cablePlan'             => 'required|string',
-            'cableNumber'           => 'required|numeric',
+            'top_up'                => 'required',
+            'cableName'             => 'required',
+            'cablePlan'             => 'required',
+            'cableNumber'           => 'required',
             'customerName'          => 'required|string',
-            'customerPhoneNumber'   => 'required|string'
+            'customerPhoneNumber'   => 'required|numeric'
         ]);
 
         if ($Validator->passes()) {
