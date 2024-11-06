@@ -171,7 +171,7 @@ class BillPayment extends Controller
         $Validator = Validator::make($request->all(), [
             'top_up'                => 'required',
             'billerName'            => 'required|string',
-            'meterType'             => 'required|numeric',
+            'meterType'             => 'required|string',
             'meterNumber'           => 'required|string',
             'amount'                => 'required|string',
             // 'customerName'          => 'required',
