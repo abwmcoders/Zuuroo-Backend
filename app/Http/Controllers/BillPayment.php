@@ -169,14 +169,16 @@ class BillPayment extends Controller
         $CheckCard              = RecurringCharge::where('user_id', $uid)->where('status', 1)->first();
 
         $Validator = Validator::make($request->all(), [
-            'top_up'                => 'required',
+            'top_up'                => 'required|numeric',
             'billerName'            => 'required|string',
-            'meterType'             => 'required|string',
+            'meterType'             => 'required|integer|in:1,2',
             'meterNumber'           => 'required|string',
             'amount'                => 'required|string',
-            // 'customerName'          => 'required',
+            'customerName'          => 'required|string',
             'customerPhoneNumber'   => 'required|string'
         ]);
+
+        $meterType      = (int)$request->meterType;
 
         if ($Validator->passes()) {
 
@@ -205,12 +207,12 @@ class BillPayment extends Controller
                                 "disco_name"        => $request->billerName,
                                 "amount"            => $request->amount,
                                 "meter_number"      => $request->meterNumber,
-                                "MeterType"         => $request->meterType,
+                                "MeterType"         => $meterType,
                             ];
                             $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails));
 
 
-                            return response()->json($response);
+                           // return response()->json($response);
                             // !TODO: STORE TO HISTORY
                             // return $response;
                             if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
@@ -263,7 +265,8 @@ class BillPayment extends Controller
                                 return response()->json([
                                     'success'       => false,
                                     'statusCode'    => 500,
-                                    'message'       => 'But Your wallet has not been debited'
+                                    'message'       => 'But Your wallet has not been debited',
+                                    'data'          => $response,
                                 ]);
                             }
                         }
@@ -283,7 +286,7 @@ class BillPayment extends Controller
 
                                                 $billDetails = [
                                                     'disco_name'    => $request->billerName,
-                                                    'MeterType'     => $request->meterType,
+                                                    'MeterType'     => $meterType,
                                                     'meter_number'  => $request->meterNumber,
                                                     'amount'        => $request->amount,
                                                 ];
@@ -439,7 +442,7 @@ class BillPayment extends Controller
 
                             $billDetails = [
                                 'cablename'         => $cableName,
-                                'cableplan'         => $cablePlan,
+                                'cableplan'         => $planId,
                                 'smart_card_number' => $cableNumber,
                             ];
 
@@ -497,7 +500,8 @@ class BillPayment extends Controller
                                 return response()->json([
                                     'success'       => false,
                                     'statusCode'    => 500,
-                                    'message'       => 'Error, your account has been auto-refunded !!!'
+                                    'message'       => 'Error, your account has been auto-refunded !!!',
+                                    'data'          => $response
                                 ]);
                             }
                             // return $user->create_pin;
@@ -533,7 +537,7 @@ class BillPayment extends Controller
                                                     $billDetails = [
                                                         'cablename'         => $cableName,
                                                         'smart_card_number' => $cableNumber,
-                                                        'cableplan'         => $cablePlan,
+                                                        'cableplan'         => $planId,
                                                     ];
                                                     $response = json_decode($this->BillPaymentRepository->payCableTV($billDetails));
                                                     // return $response;
