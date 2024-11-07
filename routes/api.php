@@ -182,7 +182,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('histories/{status}', 'getUserProcessingStateHistory');
     });
 
-
     //! ---- User Activities ----
     Route::get('/user/faqs', [UserController::class, 'faqs']);
     Route::get('/user/loans', [UserController::class, 'loans']);
@@ -190,8 +189,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user-loan-receipt/{id}', [UserController::class, 'userLoanReceipt']);
     Route::put('/user/update-password', [UserController::class, 'updatePassword']);
     Route::put('/user/update-pin', [UserController::class, 'updatePin']);
+    Route::post('/user/request-pin-change', [UserController::class, 'requestPinChange']);
     Route::put('/update-phone', [UserController::class, 'updatePhoneNumber']);
     Route::post('/user/verify-pin', [UserController::class, 'verifyPin']);
+    Route::post('/user/verify-otp', [UserController::class, 'verifyOtp']);
 });
 
 //! ---- About us ---------

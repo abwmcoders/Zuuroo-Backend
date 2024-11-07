@@ -83,6 +83,7 @@ class AuthController extends Controller
             ], 401);
         }
     }
+    
 
     public function logout(Request $request)
     {
@@ -90,7 +91,6 @@ class AuthController extends Controller
 
         return $this->successResponse(message: 'Logged out successfully',); 
     }
-
 
     public function verifyOtp( Request $request) 
     {
@@ -130,7 +130,7 @@ class AuthController extends Controller
         }
     }
 
-    public function requestPasswordReset( Request $request) {
+    public function requestPasswordReset(Request $request) {
         $validatedData = $request->validate([
             'email' => 'required|string|email|max:255',
         ]);

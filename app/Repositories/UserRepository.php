@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\userBankDetail;
 use App\Models\TermCondition;
 use App\Models\Pricing;
+use Carbon\Carbon;
 
 class UserRepository
 {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\RegistrationResource;
 use App\Interfaces\ProfileServiceInterface;
+use App\Mail\OtpMail;
 use App\Models\LoanHistory;
 use App\Models\User;
 use App\Repositories\FaqRepository;
@@ -15,11 +16,13 @@ use App\Repositories\SupportRepository;
 use App\Repositories\UserBankDetailsRepository;
 use App\Repositories\UserRepository;
 use App\Traits\ApiResponseTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -176,12 +179,50 @@ class UserController extends Controller
         ]);
 
         $userDetails = [
-            'create_pin' => Hash::make($request->pin)
+            'create_pin' => Hash::make($request->pin),
+            'otp' => null,
+            'otp_expires_at' => null,
         ];
 
         $this->UserRepository->updateUser($uid, $userDetails);
         return $this->successResponse(message: 'Pin updated successfully.',);
     }
+
+
+    public function requestPinChange(Request $request)
+    {
+        $validatedData = $request->validate([
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        $user = User::where('email', $validatedData['email'])->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found.'
+            ], 404);
+        }
+
+        $this->generateAndSendOtp($user);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'OTP sent for password reset.'
+        ]);
+    }
+
+    protected function generateAndSendOtp($user)
+    {
+        $otp = rand(100000, 999999);
+        $user->otp = $otp;
+        $user->otp_expires_at = Carbon::now()->addMinutes(10);
+        $user->save();
+
+        // Send OTP email
+        Mail::to($user->email)->send(new OtpMail($otp));
+    }
+
 
     //!-- Verify Pin ----
     public function verifyPin(Request $request)
@@ -211,6 +252,32 @@ class UserController extends Controller
 
         
     }
+
+    //!-- Verify OTP ----
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|string|size:6',
+        ]);
+
+        $uid = Auth::id();
+        $user = $this->UserRepository->verifyPin($uid);
+
+        if (!$user) {
+            return $this->errorResponse(message: 'Unauthorized', code: 401);
+        }
+
+        // Ensure otp_expires_at is a Carbon instance before using isFuture()
+        $otpExpiresAt = Carbon::parse($user->otp_expires_at);
+
+        if ($user->otp === $request->otp && $otpExpiresAt->isFuture()) {
+            return $this->successResponse(message: 'OTP verification successful');
+        }
+
+        return $this->errorResponse(message: 'Invalid or expired OTP', code: 401);
+    }
+
+
 
     //!-- Update Phone Number ----
     public function updatePhoneNumber(Request $request)
