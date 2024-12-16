@@ -190,7 +190,7 @@ class AirtimeController extends Controller
                                                     'success'       => false,
                                                     'statusCode'    => 500,
                                                     'Error'         => $createNigData,
-                                                    'message'       => 'An error occured, try later!!!',
+                                                    'message'       => 'Transaction failed, try later !!!',
                                                 ]);
                                             }
                                         } catch (\Exception $e) {
@@ -267,7 +267,7 @@ class AirtimeController extends Controller
                                                 $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                                 $this->WalletRepository->updateWallet($uid, $walletDetails);
 
-                                                return $this->errorResponse(message: 'Error Occured, try later !!!',);
+                                                return $this->errorResponse(message: 'Transaction failed, try later !!!',);
                                             }
                                         } else {
                                             return $this->errorResponse(message: 'Internal Server Error, Please Retry !!!',);
@@ -406,7 +406,7 @@ class AirtimeController extends Controller
                                                                     return $this->errorResponse(message: 'Transaction Failed !!!',);
                                                                 }
                                                             } else {
-                                                                return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+                                                                return $this->errorResponse(message: 'Transaction failed, try later !!!',);
                                                             }
                                                         }
                                                     }

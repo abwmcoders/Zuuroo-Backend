@@ -191,7 +191,7 @@ class DataController extends Controller
                                         $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                         $this->WalletRepository->updateWallet($uid, $walletDetails);
 
-                                        return $this->errorResponse(message: 'Internal Server Error, Please Try Later !!!',);
+                                        return $this->errorResponse(message: 'Transaction failed, try later !!!',);
 
                                         // --------------------------------------------------------------------------
 

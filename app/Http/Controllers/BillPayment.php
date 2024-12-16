@@ -252,7 +252,7 @@ class BillPayment extends Controller
                                     return response()->json([
                                         'success'       => false,
                                         'statusCode'    => 500,
-                                        'message'       => 'Internal Server Error'
+                                        'message'       => 'Transaction failed, try later !!!'
                                     ]);
                                 }
                             } else {
@@ -334,7 +334,7 @@ class BillPayment extends Controller
                                                         return response()->json([
                                                             'success'       => false,
                                                             'statusCode'    => 500,
-                                                            'message'       => 'Internal Server Error'
+                                                            'message'       => 'Transaction failed, try later !!!'
                                                         ]);
                                                     }
                                                 } else {
@@ -488,7 +488,7 @@ class BillPayment extends Controller
                                     return response()->json([
                                         'success'       => false,
                                         'statusCode'    => 500,
-                                        'message'       => 'Internal Server Error !!!'
+                                        'message'       => 'Transaction failed, try later !!!'
                                     ]);
                                 }
                             } else {
@@ -579,7 +579,7 @@ class BillPayment extends Controller
                                                             return response()->json([
                                                                 'success'       => false,
                                                                 'statusCode'    => 500,
-                                                                'message'       => 'Internal Server Error !!!'
+                                                                'message'       => 'Transaction failed, try later !!!'
                                                             ]);
                                                         }
                                                     } else {
