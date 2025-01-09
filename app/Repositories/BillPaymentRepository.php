@@ -135,6 +135,111 @@ class BillPaymentRepository
         return "No error found.";
     }
 
+    public function getAllBillers()
+    {
+        try {
+            $apiUrl = 'https://sandbox.giftbills.com/api/v1/electricity';
+            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; // env('I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'); 
+            $merchantId = 'Themade'; //env('Themade'); 
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'MerchantId' => $merchantId,
+                'Content-Type' => 'application/json',
+            ])->get($apiUrl);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            return [
+                'error' => true,
+                'message' => 'Failed to fetch billers',
+                'details' => $response->json(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'message' => 'An error occurred while fetching billers',
+                'details' => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function verify(string $provider, string $number, string $type)
+    {
+        try {
+            $apiUrl = 'https://sandbox.giftbills.com/api/v1/electricity/validate';
+            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; //env('API_KEY'); 
+            $merchantId = 'Themade'; //env('MERCHANT_ID');
+
+            $body = [
+                'provider' => $provider,
+                'number' => $number,
+                'type' => $type,
+            ];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'MerchantId' => $merchantId,
+                'Content-Type' => 'application/json',
+            ])->post($apiUrl, $body);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            return [
+                'error' => true,
+                'message' => 'Failed to validate customer ID',
+                'details' => $response->json(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'message' => 'An error occurred while validating customer ID',
+                'details' => $e->getMessage(),
+            ];
+        }
+    }
+
+
+    public function purchasePower(array $data)
+    {
+        try {
+            $apiUrl = 'https://sandbox.giftbills.com/api/v1/electricity/recharge';
+            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; //env('API_KEY'); 
+            $merchantId = 'Themade'; //env('MERCHANT_ID');
+            $encryptionKey = 'SHAQBOTFHF951736357278'; //env('ENCRYPTION_KEY');
+
+            $signature = hash_hmac('sha512', json_encode($data), $encryptionKey);
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'MerchantId' => $merchantId,
+                'Encryption' => $signature,
+                'Content-Type' => 'application/json',
+            ])->post($apiUrl, $data);
+
+            return $response;
+            // if ($response->successful()) {
+            //     return $response->json();
+            // }
+
+            // return [
+            //     'error' => true,
+            //     'message' => 'Failed to purchase bet',
+            //     'details' => $response->json(),
+            // ];
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'message' => 'An error occurred while processing the purchase bet request',
+                'details' => $e->getMessage(),
+            ];
+        }
+    }
+
     public function ResulCheckerRepository(){}
 
 }

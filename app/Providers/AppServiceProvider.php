@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Interfaces\ProfileServiceInterface;
 use App\Interfaces\UserServiceInterface;
+use App\Repositories\BettingRepository;
+use App\Services\BettingService;
 use App\Services\ProfileService;
 use App\Services\UserService;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -18,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(ProfileServiceInterface::class, ProfileService::class);
+        $this->app->singleton(BettingService::class, function ($app) {
+            return new BettingService(new BettingRepository());
+        });
     }
 
     /**

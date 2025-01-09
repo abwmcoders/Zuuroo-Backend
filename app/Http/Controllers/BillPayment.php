@@ -145,7 +145,6 @@ class BillPayment extends Controller
     // payElectricity
 
     public function payElectricity(Request $request)
-    // : JsonResponse
     {
 
         // try{
@@ -396,6 +395,7 @@ class BillPayment extends Controller
             'customerName'          => 'required|string',
             'customerPhoneNumber'   => 'required|string'
         ]);
+        
         $cableName      = (int)$request->cableName;
         $cableNumber    = (int)$request->cableNumber;
         $cablePlan      = (int)$request->cablePlan;
@@ -637,4 +637,267 @@ class BillPayment extends Controller
         // }
 
     }
+
+    //! get billers for electricity
+    public function getBillers()
+    {
+        return response()->json($this->BillPaymentRepository->getAllBillers());
+    }
+
+    //! verify meter number
+    public function verifyMeter(Request $request)
+    {
+        $request->validate([
+            'provider' => 'required|string',
+            'number' => 'required|string',
+            'type' => 'required|string',
+        ]);
+
+        return response()->json($this->BillPaymentRepository->verify($request->provider, $request->number, $request->type));
+    }
+
+    public function buyPower(Request $request)
+    {
+
+        // try{
+        date_default_timezone_set("Africa/Lagos");
+        // echo date_default_timezone_get();
+        $requestID = date('YmdHi') . rand(99, 9999999);
+
+        $uid                    = Auth::user()->id;
+        $req_Account_process    = $this->WalletRepository->getWalletBalance($uid);
+        $req_bal_process        = $req_Account_process->balance;
+        $req_loanBal_process    = $req_Account_process->loan_balance;
+        $user                   = $this->UserRepository->getUserById($uid);
+        $LoanCountry            = Country::where('is_loan', true)->where('country_code', $request->country)->get();
+        $amount                 = $request->amount;
+
+        // -------------------------------- KYC --------------------------------------------------------------------------------------
+        $Kyc                    = Kyc::where('user_id', $uid)->first();
+        // ---------------------------------------------------------------------------------------------------------------------------
+
+        // -------------------------------- CHECK CARD --------------------------------------------------------------------------------
+        $CheckCard              = RecurringCharge::where('user_id', $uid)->where('status', 1)->first();
+
+        $Validator = Validator::make($request->all(), [
+            'top_up'                => 'required|numeric',
+            'provider'            => 'required|string',
+            'meterType'             => 'required|string',
+            'meterNumber'           => 'required|string',
+            'amount'                => 'required|string',
+            'reference'               => 'required|string',
+            'customerName'          => 'required|string',
+            'customerPhoneNumber'   => 'required|string'
+        ]);
+
+        // $meterType      = (int)$request->meterType;
+
+        if ($Validator->passes()) {
+
+            // Validate Account Verification
+            if ($user->email_verified_at != "" && $user->create_pin != 0) {
+                if (Hash::check($request->pin, $user->create_pin)) {
+                    // dd('Debugging here');
+
+                    if ($request->top_up == 1) {
+                        if ($req_bal_process < $request->amount) {
+
+                            return response()->json([
+                                'success'       => false,
+                                'statusCode'    => 500,
+                                'message'       => 'Insufficient fund !!!'
+                            ]);
+                        } else {
+                            $phoneNumber = str_replace('234', '0', $request->customerPhoneNumber);
+
+                            // Debit User Account Before Proceeding For Transaction .....
+                            $new_bal_process = $req_bal_process - $request->amount;
+                            $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                            $this->WalletRepository->updateWallet($uid, $walletDetails);
+
+                            $billDetails = [
+                                "provider"        => $request->provider,
+                                "amount"            => $request->amount,
+                                "number"      => $request->meterNumber,
+                                "type"         => $request->meterType,
+                                "reference"         => $request->reference,
+                            ];
+                            $response = json_decode($this->BillPaymentRepository->purchasePower($billDetails));
+
+
+                            // return response()->json($response);
+                            // !TODO: STORE TO HISTORY
+                            // return $response;
+                            if (isset($response->Status) && $response->status == true) {
+
+                                $HistoryDetails = [
+                                    'user_id'               => $uid,
+                                    'purchase'              => 'electricity',
+                                    'country_code'          =>  "NG",
+                                    'operator_code'         =>  $request->provider,
+                                    'plan'                  => $response['data']['units'],
+                                    'product_code'          => $response['data']['purchased_code'],
+                                    'transfer_ref'          => $response['data']['orderNo'],
+                                    'phone_number'          => $user->number,
+                                    'distribe_ref'          => $response['data']['orderNo'],
+                                    'selling_price'         => $request->amount,
+                                    'cost_price'         => $request->amount,
+                                    'receive_value'         =>  $response['data']['units'],
+                                    'receive_currency'      =>  'NGN',
+                                    //'deviceNo'              => $request->meterNumber,
+                                    'commission_applied'    => 0,
+                                    'processing_state'      => $response['data']['status'],
+                                    'startedUtc'            =>  NOW(),
+                                    'completedUtc'          =>  NOW(),
+                                    'send_value'            => $request->amount,
+                                ];
+
+                                $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
+                                if ($createHistory) {
+
+                                    return response()->json([
+                                        'success'       => true,
+                                        'statusCode'    => 200,
+                                        'message'       => 'You\'ve Successfully Purchased A Biller'
+                                    ]);
+                                } else {
+
+                                    return response()->json([
+                                        'success'       => false,
+                                        'statusCode'    => 500,
+                                        'message'       => 'Transaction failed, try later !!!'
+                                    ]);
+                                }
+                            } else {
+
+                                // Failed Transaction Auto Refund User Wallet
+                                $new_bal_process = $req_bal_process + $request->amount;
+                                $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                                $this->WalletRepository->updateWallet($uid, $walletDetails);
+
+                                return response()->json([
+                                    'success'       => false,
+                                    'statusCode'    => 500,
+                                    'message'       => 'But Your wallet has not been debited',
+                                    'data'          => $response,
+                                ]);
+                            }
+                        }
+                    } else if ($request->top_up == 2) {
+                        if (!empty($CheckCard)) {
+                            // Check if loan record exist ============================================================+++
+                            $isLoan = $this->LoanHistoryRepository->getUserLoan($uid);
+                            if (!empty($isLoan)) {
+                                return $this->errorResponse(message: 'You have an outstanding debt !!!', code: 500,);
+                            } else {
+                                if ($Kyc) {
+                                    if ($Kyc->verificationStatus == 1) {
+                                        if ($LoanCountry) {
+                                            if ($req_loanBal_process >= 100) {
+                                                return $this->errorResponse(message: 'Your Balance Is Still High, You Cannot Loan At This Time !!!',);
+                                            } else {
+
+                                                $billDetails = [
+                                                    "provider"        => $request->provider,
+                                                    "amount"            => $request->amount,
+                                                    "number"      => $request->meterNumber,
+                                                    "type"         => $request->meterType,
+                                                    "reference"         => $request->reference,
+                                                ];
+                                                $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails));
+                                                // return response()->json($response);
+                                                //!TODO: STORE TO HISTORY
+                                                if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
+                                                    //update loan amount
+                                                    $new_loanBal_process = $req_loanBal_process + $amount;
+                                                    $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
+                                                    $this->WalletRepository->updateWallet($uid, $walletDetails);
+
+                                                    $HistoryDetails = [
+                                                        'user_id'               => $uid,
+                                                        'purchase'              => 'electricity',
+                                                        'country_code'          =>  "NG",
+                                                        'operator_code'         =>  $request->provider,
+                                                        'plan'                  => $response['data']['units'],
+                                                        'product_code'          => $response['data']['purchased_code'],
+                                                        'transfer_ref'          => $response['data']['orderNo'],
+                                                        'phone_number'          => $user->number,
+                                                        'distribe_ref'          => $response['data']['orderNo'],
+                                                        'selling_price'         => $request->amount,
+                                                        'cost_price'         => $request->amount,
+                                                        'receive_value'         =>  $response['data']['units'],
+                                                        'receive_currency'      =>  'NGN',
+                                                        //'deviceNo'              => $request->meterNumber,
+                                                        'commission_applied'    => 0,
+                                                        'processing_state'      => $response['data']['status'],
+                                                        'startedUtc'            =>  NOW(),
+                                                        'completedUtc'          =>  NOW(),
+                                                        'send_value'            => $request->amount,
+                                                    ];
+
+                                                    $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
+                                                    if ($createHistory) {
+
+                                                        return response()->json([
+                                                            'success'       => true,
+                                                            'statusCode'    => 200,
+                                                            'message'       => 'You\'ve Successfully Purchased A Biller'
+                                                        ]);
+                                                    } else {
+
+                                                        return response()->json([
+                                                            'success'       => false,
+                                                            'statusCode'    => 500,
+                                                            'message'       => 'Transaction failed, try later !!!'
+                                                        ]);
+                                                    }
+                                                } else {
+
+                                                    return response()->json([
+                                                        'success'       => false,
+                                                        'statusCode'    => 500,
+                                                        'message'       => 'But Your wallet has not been debited'
+                                                    ]);
+                                                }
+                                            }
+                                        } else {
+                                            return $this->errorResponse(message: 'Sorry, loan is not available in the selected country !!!',);
+                                        }
+                                    } else {
+                                        return $this->errorResponse(message: 'Verification Status Is Still Pending !!!',);
+                                    }
+                                } else {
+                                    return $this->errorResponse(message: 'Kindly proceed to kyc page !!!',);
+                                }
+                            }
+                        } else {
+                            return $this->errorResponse(message: 'Please Add Card To Continue !!!', code: 500,);
+                        }
+                    } else {
+                        return $this->errorResponse(message: 'Invalid Selection, Please Make a Choice !!!', code: 500,);
+                    }
+                } else {
+
+                    return response()->json([
+                        'success'       => false,
+                        'statusCode'    => 500,
+                        'message'       => 'Error, Invalid PIN !!'
+                    ]);
+                }
+            }
+        } else {
+            return response()->json([
+                'statusCode' => 400,
+                'success'   => false,
+                'message'   => 'Check All Input Fields !!!',
+            ]);
+        }
+        // } catch (\Exception $e) {
+        //     return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+        // }
+
+    }
+
+
+
 }

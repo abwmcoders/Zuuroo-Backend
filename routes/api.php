@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AirtimeController;
 use App\Http\Controllers\AirtimeProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BettingController;
 use App\Http\Controllers\BillPayment;
 use App\Http\Controllers\CablePlanController;
 use App\Http\Controllers\CableSubscriptionController;
@@ -96,6 +97,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bill/verify-meter', [BillPayment::class, 'verify_meterNo']);
     Route::post('/bill/payment', [BillPayment::class, 'payElectricity']);
     Route::get('/bill/electricity-billers', [ElectricityBillerNameController::class, 'getAll']);
+    Route::post('/bill/verify-biller', [BillPayment::class, 'verifyMeter']);
+    Route::post('/bill/power/purchase', [BillPayment::class, 'buyPower']);
+    Route::get('/bill/power/billers', [ElectricityBillerNameController::class, 'getBillers']);
     Route::get('/bill/electricity-billers/status/{status}', [ElectricityBillerNameController::class, 'getByStatus']);
 
 
@@ -103,6 +107,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cable/verify-iuc', [BillPayment::class, 'verify_iucNo']);
     Route::get('/cable/cable-plan/{id}', [BillPayment::class, 'getCablePlan']);
     Route::post('/cable/payment', [BillPayment::class, 'payCableTV']);
+
+
+    //! ---- Betting Purchase ----
+    Route::prefix('betting')->group(function () {
+        Route::get('billers', [BettingController::class, 'getBillers']);
+        Route::post('validate-customer', [BettingController::class, 'validateCustomerId']);
+        Route::post('purchase', [BettingController::class, 'purchaseBet']);
+    });
 
     //!------------------ cable providers--------------
     Route::get('/cable-subscriptions', [CableSubscriptionController::class, 'index']);
