@@ -78,8 +78,8 @@ class BettingController extends Controller
                         $new_bal_process = $req_bal_process - $request->amount;
                         $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                         $this->WalletRepository->updateWallet($uid, $walletDetails);
-                        $response = json_decode($this->bettingService->purchaseBet($request->all()));
-                        if (isset($response->Status) && $response->status == true) {
+                        $response = json_decode($this->bettingService->purchaseBet($request->all()), true);
+                        if ($response->success == true) {
 
                             $HistoryDetails = [
                                 'user_id'               => $uid,
@@ -88,9 +88,9 @@ class BettingController extends Controller
                                 'country_code'          => "NG",
                                 'operator_code'         => $request->provider,
                                 'product_code'          => "VTU",
-                                'transfer_ref'          => $response['data']['reference'],
+                                'transfer_ref'          => $response->data->reference,
                                 'phone_number'          => $user->mobile,
-                                'distribe_ref'          => $response['data']['orderNo'],
+                                'distribe_ref'          => $response->data->orderNo,
                                 'selling_price'         => $response->amount,
                                 // 'description'           => 'Delivered',
                                 //'deviceNo'              => $request->meterNumber,
@@ -101,7 +101,7 @@ class BettingController extends Controller
                                 'cost_price'            => $request->amount,
                                 'startedUtc'            => NOW(),
                                 'completedUtc'          => $response->create_date,
-                                'processing_state'      => $response['data']['status'],
+                                'processing_state'      => $response->data->status,
                             ];
                             $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
                             if ($createHistory) {

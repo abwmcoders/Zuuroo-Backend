@@ -696,11 +696,11 @@ class BillPayment extends Controller
 
             // Validate Account Verification
             if ($user->email_verified_at != "" && $user->create_pin != 0) {
-                if (Hash::check($request->pin, $user->create_pin)) {
+                if (!Hash::check($request->pin, $user->create_pin)) {
                     // dd('Debugging here');
 
                     if ($request->top_up == 1) {
-                        if ($req_bal_process < $request->amount) {
+                        if ($req_bal_process > $request->amount) {
 
                             return response()->json([
                                 'success'       => false,
@@ -727,26 +727,25 @@ class BillPayment extends Controller
 
                             // return response()->json($response);
                             // !TODO: STORE TO HISTORY
-                            // return $response;
-                            if (isset($response->Status) && $response->status == true) {
+                            if ($response->success == true) {
 
                                 $HistoryDetails = [
                                     'user_id'               => $uid,
                                     'purchase'              => 'electricity',
                                     'country_code'          =>  "NG",
                                     'operator_code'         =>  $request->provider,
-                                    'plan'                  => $response['data']['units'],
-                                    'product_code'          => $response['data']['purchased_code'],
-                                    'transfer_ref'          => $response['data']['orderNo'],
-                                    'phone_number'          => $user->number,
-                                    'distribe_ref'          => $response['data']['orderNo'],
+                                    'plan'                  => $response->data->units,
+                                    'product_code'          => $response->data->purchased_code , 
+                                    'transfer_ref'          => $response->data->orderNo,
+                                    'phone_number'          => $user->mobile,
+                                    'distribe_ref'          => $response->data->orderNo,
                                     'selling_price'         => $request->amount,
                                     'cost_price'         => $request->amount,
-                                    'receive_value'         =>  $response['data']['units'],
+                                    'receive_value'         =>  $response->data->units,
                                     'receive_currency'      =>  'NGN',
                                     //'deviceNo'              => $request->meterNumber,
                                     'commission_applied'    => 0,
-                                    'processing_state'      => $response['data']['status'],
+                                    'processing_state'      => $response->data->status,
                                     'startedUtc'            =>  NOW(),
                                     'completedUtc'          =>  NOW(),
                                     'send_value'            => $request->amount,
@@ -804,36 +803,32 @@ class BillPayment extends Controller
                                                     "type"         => $request->meterType,
                                                     "reference"         => $request->reference,
                                                 ];
-                                                $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails));
+                                                $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails), true);
                                                 // return response()->json($response);
                                                 //!TODO: STORE TO HISTORY
-                                                if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
-                                                    //update loan amount
-                                                    $new_loanBal_process = $req_loanBal_process + $amount;
-                                                    $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
-                                                    $this->WalletRepository->updateWallet($uid, $walletDetails);
+                                                if ($response->success == true) {
 
                                                     $HistoryDetails = [
-                                                        'user_id'               => $uid,
-                                                        'purchase'              => 'electricity',
-                                                        'country_code'          =>  "NG",
-                                                        'operator_code'         =>  $request->provider,
-                                                        'plan'                  => $response['data']['units'],
-                                                        'product_code'          => $response['data']['purchased_code'],
-                                                        'transfer_ref'          => $response['data']['orderNo'],
-                                                        'phone_number'          => $user->number,
-                                                        'distribe_ref'          => $response['data']['orderNo'],
-                                                        'selling_price'         => $request->amount,
-                                                        'cost_price'         => $request->amount,
-                                                        'receive_value'         =>  $response['data']['units'],
-                                                        'receive_currency'      =>  'NGN',
-                                                        //'deviceNo'              => $request->meterNumber,
-                                                        'commission_applied'    => 0,
-                                                        'processing_state'      => $response['data']['status'],
-                                                        'startedUtc'            =>  NOW(),
-                                                        'completedUtc'          =>  NOW(),
-                                                        'send_value'            => $request->amount,
-                                                    ];
+                                                            'user_id'               => $uid,
+                                                            'purchase'              => 'electricity',
+                                                            'country_code'          =>  "NG",
+                                                            'operator_code'         =>  $request->provider,
+                                                            'plan'                  => $response->data->units,
+                                                            'product_code'          => $response->data->purchased_code,
+                                                            'transfer_ref'          => $response->data->orderNo,
+                                                            'phone_number'          => $user->mobile,
+                                                            'distribe_ref'          => $response->data->orderNo,
+                                                            'selling_price'         => $request->amount,
+                                                            'cost_price'         => $request->amount,
+                                                            'receive_value'         =>  $response->data->units,
+                                                            'receive_currency'      =>  'NGN',
+                                                            //'deviceNo'              => $request->meterNumber,
+                                                            'commission_applied'    => 0,
+                                                            'processing_state'      => $response->data->status,
+                                                            'startedUtc'            =>  NOW(),
+                                                            'completedUtc'          =>  NOW(),
+                                                            'send_value'            => $request->amount,
+                                                        ];
 
                                                     $createHistory = $this->HistoryRepository->createHistory($HistoryDetails);
                                                     if ($createHistory) {
@@ -853,10 +848,16 @@ class BillPayment extends Controller
                                                     }
                                                 } else {
 
+                                                    // Failed Transaction Auto Refund User Wallet
+                                                    $new_bal_process = $req_bal_process + $request->amount;
+                                                    $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
+                                                    $this->WalletRepository->updateWallet($uid, $walletDetails);
+
                                                     return response()->json([
                                                         'success'       => false,
                                                         'statusCode'    => 500,
-                                                        'message'       => 'But Your wallet has not been debited'
+                                                        'message'       => 'But Your wallet has not been debited',
+                                                        'data'          => $response,
                                                     ]);
                                                 }
                                             }

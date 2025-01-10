@@ -99,7 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bill/electricity-billers', [ElectricityBillerNameController::class, 'getAll']);
     Route::post('/bill/verify-biller', [BillPayment::class, 'verifyMeter']);
     Route::post('/bill/power/purchase', [BillPayment::class, 'buyPower']);
-    Route::get('/bill/power/billers', [ElectricityBillerNameController::class, 'getBillers']);
+    Route::get('/bill/power/billers', [BillPayment::class, 'getBillers']);
     Route::get('/bill/electricity-billers/status/{status}', [ElectricityBillerNameController::class, 'getByStatus']);
 
 
