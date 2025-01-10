@@ -65,7 +65,7 @@ class BettingController extends Controller
         $req_loanBal_process = $req_Account_process->loan_balance;
 
         if ($user->email_verified_at != "" && $user->create_pin != 0){
-            if (!Hash::check($request->pin, $user->create_pin)){
+            if (Hash::check($request->pin, $user->create_pin)){
                 if ($request->top_up == 1){
                     if ($req_bal_process < $request->amount) {
                         return response()->json([
@@ -78,7 +78,7 @@ class BettingController extends Controller
                         $new_bal_process = $req_bal_process - $request->amount;
                         $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                         $this->WalletRepository->updateWallet($uid, $walletDetails);
-                        $response = json_decode($this->bettingService->purchaseBet($request->all()), true);
+                        $response = json_decode($this->bettingService->purchaseBet($request->all()));
                         if ($response->success == true) {
 
                             $HistoryDetails = [

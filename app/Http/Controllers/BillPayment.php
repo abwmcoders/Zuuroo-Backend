@@ -696,11 +696,11 @@ class BillPayment extends Controller
 
             // Validate Account Verification
             if ($user->email_verified_at != "" && $user->create_pin != 0) {
-                if (!Hash::check($request->pin, $user->create_pin)) {
+                if (Hash::check($request->pin, $user->create_pin)) {
                     // dd('Debugging here');
 
                     if ($request->top_up == 1) {
-                        if ($req_bal_process > $request->amount) {
+                        if ($req_bal_process < $request->amount) {
 
                             return response()->json([
                                 'success'       => false,
@@ -803,7 +803,7 @@ class BillPayment extends Controller
                                                     "type"         => $request->meterType,
                                                     "reference"         => $request->reference,
                                                 ];
-                                                $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails), true);
+                                                $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails));
                                                 // return response()->json($response);
                                                 //!TODO: STORE TO HISTORY
                                                 if ($response->success == true) {
