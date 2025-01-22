@@ -240,7 +240,7 @@ class UserController extends Controller
 
         if($user) {
             // Check if the input PIN matches the hashed pin in the user's record
-            if (Hash::check($request->pin, $user->create_pin)) {
+            if (!Hash::check($request->pin, $user->create_pin)) {
                 return $this->successResponse(message: 'PIN verification successful');
             } else {
                 return $this->errorResponse(message: 'PIN does not match', code: 401,);

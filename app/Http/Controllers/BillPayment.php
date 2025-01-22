@@ -727,7 +727,7 @@ class BillPayment extends Controller
 
                             // return response()->json($response);
                             // !TODO: STORE TO HISTORY
-                            if ($response->success == true) {
+                            if (property_exists($response, 'success') && $response->success == true) {
 
                                 $HistoryDetails = [
                                     'user_id'               => $uid,
@@ -796,6 +796,14 @@ class BillPayment extends Controller
                                                 return $this->errorResponse(message: 'Your Balance Is Still High, You Cannot Loan At This Time !!!',);
                                             } else {
 
+                                                // $billDetails = [
+                                                //     "provider"        => $request->provider,
+                                                //     "amount"            => $request->amount,
+                                                //     "number"      => $request->meterNumber,
+                                                //     "type"         => $request->meterType,
+                                                //     "reference"         => $request->reference,
+                                                // ];
+                                                // $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails));
                                                 $billDetails = [
                                                     "provider"        => $request->provider,
                                                     "amount"            => $request->amount,
@@ -803,11 +811,10 @@ class BillPayment extends Controller
                                                     "type"         => $request->meterType,
                                                     "reference"         => $request->reference,
                                                 ];
-                                                $response = json_decode($this->BillPaymentRepository->payElectricity($billDetails));
-                                                // return response()->json($response);
+                                                $response = json_decode($this->BillPaymentRepository->purchasePower($billDetails));
+                                                //return response()->json($response);
                                                 //!TODO: STORE TO HISTORY
-                                                if ($response->success == true) {
-
+                                                if (property_exists($response, 'success') && $response->success == true) {
                                                     $HistoryDetails = [
                                                             'user_id'               => $uid,
                                                             'purchase'              => 'electricity',

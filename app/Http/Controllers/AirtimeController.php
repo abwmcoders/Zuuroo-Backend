@@ -270,7 +270,7 @@ class AirtimeController extends Controller
                                                 return $this->errorResponse(message: 'Transaction failed, try later !!!',);
                                             }
                                         } else {
-                                            return $this->errorResponse(message: 'Internal Server Error, Please Retry !!!',);
+                                            return $this->errorResponse(message: 'Kindly Check Your Inputs And Retry !!!',);
                                         }
                                     }
                                     // return $response;

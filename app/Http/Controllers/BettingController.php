@@ -79,7 +79,7 @@ class BettingController extends Controller
                         $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                         $this->WalletRepository->updateWallet($uid, $walletDetails);
                         $response = json_decode($this->bettingService->purchaseBet($request->all()));
-                        if ($response->success == true) {
+                        if (property_exists($response, 'success') && $response->success == true) {
 
                             $HistoryDetails = [
                                 'user_id'               => $uid,
@@ -156,7 +156,7 @@ if ($req_bal_process < $request->amount) {
                                             $walletDetails = ['balance' => $new_bal_process, 'updated_at' => NOW()];
                                             $this->WalletRepository->updateWallet($uid, $walletDetails);
                                             $response = json_decode($this->bettingService->purchaseBet($request->all()));
-                                            if(isset($response->Status) && $response->status == true){
+                                            if(property_exists($response, 'success') && $response->success == true){
 
                                                 $HistoryDetails = [
                                                     'user_id'               => $uid,

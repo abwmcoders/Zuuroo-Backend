@@ -313,7 +313,7 @@ class DataController extends Controller
                                         }
                                     } else {
 
-                                        return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+                                        return $this->errorResponse(message: 'Kindly Check All Inputs And Retry !!!',);
                                     }
                                 }
                             }
@@ -499,7 +499,7 @@ class DataController extends Controller
                 return $this->errorResponse(message: 'No payment record found !!!',);
             }
         } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!! qaqa',);
         }
     }
 }
