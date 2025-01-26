@@ -138,9 +138,9 @@ class BillPaymentRepository
     public function getAllBillers()
     {
         try {
-            $apiUrl = 'https://sandbox.giftbills.com/api/v1/electricity';
-            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; // env('I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'); 
-            $merchantId = 'Themade'; //env('Themade'); 
+            $apiUrl = 'https://giftbills.com/api/v1/electricity';
+            $apiKey = 'AZGK9SK82FRXFI4XMCW6CYGCQWECPK1'; // env('I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'); 
+            $merchantId = 'Zuuroo'; //env('Themade'); 
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
@@ -169,9 +169,9 @@ class BillPaymentRepository
     public function verify(string $provider, string $number, string $type)
     {
         try {
-            $apiUrl = 'https://sandbox.giftbills.com/api/v1/electricity/validate';
-            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; //env('API_KEY'); 
-            $merchantId = 'Themade'; //env('MERCHANT_ID');
+            $apiUrl = 'https://giftbills.com/api/v1/electricity/validate';
+            $apiKey = 'AZGK9SK82FRXFI4XMCW6CYGCQWECPK1'; //env('API_KEY'); 
+            $merchantId = 'Zuuroo'; //env('MERCHANT_ID');
 
             $body = [
                 'provider' => $provider,
@@ -207,10 +207,10 @@ class BillPaymentRepository
     public function purchasePower(array $data)
     {
         try {
-            $apiUrl = 'https://sandbox.giftbills.com/api/v1/electricity/recharge';
-            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; //env('API_KEY'); 
-            $merchantId = 'Themade'; //env('MERCHANT_ID');
-            $encryptionKey = 'SHAQBOTFHF951736357278'; //env('ENCRYPTION_KEY');
+            $apiUrl = 'https://giftbills.com/api/v1/electricity/recharge';
+            $apiKey = 'AZGK9SK82FRXFI4XMCW6CYGCQWECPK1'; //env('API_KEY'); 
+            $merchantId = 'Zuuroo'; //env('MERCHANT_ID');
+            $encryptionKey = 'X05P6KB0QE7M1735588849'; //env('ENCRYPTION_KEY');
 
             $signature = hash_hmac('sha512', json_encode($data), $encryptionKey);
 

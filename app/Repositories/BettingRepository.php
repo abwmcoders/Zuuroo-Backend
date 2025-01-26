@@ -9,9 +9,9 @@ class BettingRepository
     public function fetchBillers()
     {
         try {
-            $apiUrl = 'https://sandbox.giftbills.com/api/v1/betting'; 
-            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ';// env('I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'); 
-            $merchantId = 'Themade';//env('Themade'); 
+            $apiUrl = 'https://giftbills.com/api/v1/betting'; 
+            $apiKey = 'AZGK9SK82FRXFI4XMCW6CYGCQWECPK1';// env('I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'); 
+            $merchantId = 'Zuuroo';//env('Themade'); 
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
@@ -40,9 +40,9 @@ class BettingRepository
     public function validateCustomer(string $provider, string $customerId)
     {
         try {
-            $apiUrl = 'https://sandbox.giftbills.com/api/v1/betting/validate';
-            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; //env('API_KEY'); 
-            $merchantId = 'Themade'; //env('MERCHANT_ID');
+            $apiUrl = 'https://giftbills.com/api/v1/betting/validate';
+            $apiKey = 'AZGK9SK82FRXFI4XMCW6CYGCQWECPK1'; //env('API_KEY'); 
+            $merchantId = 'Zuuroo'; //env('MERCHANT_ID');
 
             $body = [
                 'provider' => $provider,
@@ -76,10 +76,10 @@ class BettingRepository
     public function purchaseBet(array $data)
     {
         try {
-            $apiUrl = 'https://sandbox.giftbills.com/api/v1/betting/topup'; 
-            $apiKey = 'I3QHMRI8EB2LZZGBLGSRVO5SR6XMNXJ'; //env('API_KEY'); 
-            $merchantId = 'Themade'; //env('MERCHANT_ID');
-            $encryptionKey = 'SHAQBOTFHF951736357278'; //env('ENCRYPTION_KEY');
+            $apiUrl = 'https://giftbills.com/api/v1/betting/topup'; 
+            $apiKey = 'AZGK9SK82FRXFI4XMCW6CYGCQWECPK1'; //env('API_KEY'); 
+            $merchantId = 'Zuuroo'; //env('MERCHANT_ID');
+            $encryptionKey = 'X05P6KB0QE7M1735588849'; //env('ENCRYPTION_KEY');
 
             $signature = hash_hmac('sha512', json_encode($data), $encryptionKey);
 
