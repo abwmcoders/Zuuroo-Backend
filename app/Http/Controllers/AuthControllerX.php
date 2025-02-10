@@ -52,6 +52,7 @@ class AuthController extends Controller
         $validatedData = $request->validated();
 
         $user = $this->create($validatedData);
+        $this->sendOtp($user);
 
         if ($user instanceof User) {
 
