@@ -15,8 +15,8 @@
                     <!-- Company Logo -->
                     <tr>
                         <td align="center" style="padding-bottom: 20px;">
-                            <img src="{{ asset('images/logo.jpeg') }}" alt="Company Logo" style="max-width: 150px; display: block;">
-                        </td>
+  <img src="https://www.zuuroo.com/public/images/zuuroo.png" alt="Company Logo" style="max-width: 150px; display: block;">
+</td>
                     </tr>
                     <!-- Welcome Text -->
                     <tr>
