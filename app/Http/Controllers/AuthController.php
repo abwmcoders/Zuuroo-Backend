@@ -84,7 +84,6 @@ class AuthController extends Controller
         }
     }
     
-
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -95,7 +94,6 @@ class AuthController extends Controller
     public function verifyOtp( Request $request) 
     {
         try {
-            
             $validatedData = $request->validate([
                 'email' => 'required|string|email|max:255',
                 'otp'   => 'required|digits:6',
@@ -153,7 +151,6 @@ class AuthController extends Controller
             'message' => 'OTP sent for password reset.'
         ]);
     }
-
 
     public function resetPassword(Request $request) {
         $validatedData = $request->validate([

@@ -499,7 +499,7 @@ class DataController extends Controller
                 return $this->errorResponse(message: 'No payment record found !!!',);
             }
         } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!! qaqa',);
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!! qaqa' . " " . $e->getMessage(),);
         }
     }
 }

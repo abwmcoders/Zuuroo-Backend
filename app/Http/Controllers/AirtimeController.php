@@ -89,20 +89,33 @@ class AirtimeController extends Controller
             // ----------------------------------------------------------------------------------------------------------------------------
 
             // -------------------------------- CHECK NETWORK ID --------------------------------------------------------------------------------
-            if ($network=='mtn'){$networkID =1;}
-            elseif ($network=='airtel'){$networkID =1;}
-            elseif ($network=='etisalat'){$networkID =1;}
-            elseif ($network=='glo'){$networkID =1;}
+            $operator = strtolower($request->input('network_operator'));
+            $networkID = null;
+
+            switch ($operator) {
+                case 'mtn':
+                    $networkID = 1;
+                    break;
+                case 'glo':
+                    $networkID = 2;
+                    break;
+                case '9mobile':
+                    $networkID = 3;
+                    break;
+                case 'airtel':
+                    $networkID = 4;
+                    break;
+                default:
+                    return response()->json(['message' => 'Invalid network operator'], 400);
+            }
+
             // -----------------------------------------------------------------------------------------------------------------------------------
 
             if ($actAmt < 1000) {
                 if (!is_null($checkPaymentRc)) {
-
                     if ($user->email_verified_at != "" && $user->number_verify_at != "") {
                         if (Hash::check($request->pin, $user->create_pin)) {
-
                             if ($request->top_up == 1) {
-
                                 $request->validate([
                                     'top_up'            =>  'required',
                                     'country'           =>  'required',
@@ -122,7 +135,8 @@ class AirtimeController extends Controller
                                         // $walletDetails = [ 'balance' => $new_bal_process, 'updated_at'=> NOW() ];
                                         // $this->WalletRepository->updateWallet($uid, $walletDetails);
 
-                                        $phoneNumber = str_replace('234', '0', strip_tags($request->phoneNumber));
+                                        // $phoneNumber = str_replace('234', '0', strip_tags($request->phoneNumber));
+                                        $phoneNumber = preg_replace('/^(?:\+234|234)/', '0', $request->phoneNumber);
 
                                         $DataDetails = [
                                             "network"           => $networkID,
@@ -295,13 +309,15 @@ class AirtimeController extends Controller
                                                             // $new_loanBal_process = $req_loanBal_process + $amount;
                                                             // $walletDetails = [ 'loan_balance' => $new_loanBal_process, 'updated_at'=> NOW() ];
                                                             // $this->WalletRepository->updateWallet($uid, $walletDetails);
-                                                            $phoneNumber = str_replace('234', '0', $request->phoneNumber);
+                                                            //  $phoneNumber = str_replace('234', '0', $request->phoneNumber);
+                                                            $phoneNumber = preg_replace('/^(?:\+234|234)/', '0', $request->phoneNumber);
+
 
                                                             // dd($amount);
                                                             $DataDetails = [
                                                                 "network"           => $networkID,
                                                                 "amount"            => $actAmt,
-                                                                "mobile_number"     => "0$phoneNumber",
+                                                                "mobile_number"     => "$phoneNumber",
                                                                 "Ported_number"     => true,
                                                                 "airtime_type"      => "VTU"
                                                             ];
@@ -313,7 +329,8 @@ class AirtimeController extends Controller
 
                                                                 if (isset($createNigData->Status) && $createNigData->Status == 'successful') {
                                                                     //update loan amount
-                                                                    $new_loanBal_process = $req_loanBal_process + $amount;
+                                                                    $new_loanBal_process = (float)$req_loanBal_process + (float)$amount;
+                                                                    // $new_loanBal_process = $req_loanBal_process + $amount;
                                                                     $walletDetails = ['loan_balance' => $new_loanBal_process, 'updated_at' => NOW()];
                                                                     $this->WalletRepository->updateWallet($uid, $walletDetails);
 
@@ -337,6 +354,7 @@ class AirtimeController extends Controller
                                                                         'commission_applied'    =>  0,
                                                                         'startedUtc'            =>  NOW(),
                                                                         'completedUtc'          =>  $createNigData->create_date,
+                                                                        'due_date'          =>  $createNigData->create_date,
                                                                         'processing_state'      =>  $createNigData->Status,
                                                                     ];
                                                                     $query = $this->LoanHistoryRepository->createLoanHistory($HistoryDetails);
@@ -429,7 +447,8 @@ class AirtimeController extends Controller
                                 return $this->errorResponse(message: 'Invalid Selection, Please Make a Choice !!!', code: 500,);
                             }
                         } else {
-                            return $this->errorResponse(message: 'Incorrect PIN !!!', code: 500,);
+
+                            return $this->errorResponse(message: 'Incorrect PIN !!!' . " ". Hash::check($request->pin) . " " . $user->create_pin, code: 500,);
                         }
                     } else {
                         return $this->errorResponse(message: 'Complete Account Verification !!!', code: 500,);
@@ -437,16 +456,14 @@ class AirtimeController extends Controller
                     // PIN Validation
 
                 } else {
-
                     return $this->errorResponse(message: 'No payment record found !!!', code: 500,);
                 }
             } else {
-
                 Log::debug(['suspected fruad' => $uid]);
                 return $this->errorResponse(message: "Suspected fraud !!! $actAmt", code: 500,);
             }
         } catch (\Exception $e) {
-            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!',);
+            return $this->errorResponse(message: 'Internal Server Error, Try Later !!!', );
         }
     }
 }
