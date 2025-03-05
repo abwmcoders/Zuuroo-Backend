@@ -178,8 +178,13 @@ class UserController extends Controller
             'pin' => ['required', 'string', 'max:4', 'confirmed']
         ]);
 
+        // $userDetails = [
+        //     'create_pin' => Hash::make($request->pin),
+        //     'otp' => null,
+        //     'otp_expires_at' => null,
+        // ];
         $userDetails = [
-            'create_pin' => Hash::make($request->pin),
+            'create_pin' => $request->pin,
             'otp' => null,
             'otp_expires_at' => null,
         ];
@@ -240,7 +245,8 @@ class UserController extends Controller
 
         if($user) {
             // Check if the input PIN matches the hashed pin in the user's record
-            if (!Hash::check($request->pin, $user->create_pin)) {
+            //if (!Hash::check($request->pin, $user->create_pin)) {
+            if ($request->pin === $user->create_pin) {
                 return $this->successResponse(message: 'PIN verification successful');
             } else {
                 return $this->errorResponse(message: 'PIN does not match', code: 401,);
@@ -277,8 +283,6 @@ class UserController extends Controller
         return $this->errorResponse(message: 'Invalid or expired OTP', code: 401);
     }
 
-
-
     //!-- Update Phone Number ----
     public function updatePhoneNumber(Request $request)
     {
@@ -295,7 +299,6 @@ class UserController extends Controller
         $this->UserRepository->updateUser($uid, $userDetails);
         return $this->successResponse(message: 'Phone number updated successfully.',);
     }
-
 
     //!---- Update Profile ------
     public function updateProfile(UpdateProfileRequest $request)
